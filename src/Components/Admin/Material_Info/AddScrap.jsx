@@ -15,6 +15,10 @@ import React, { useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 
+
+import { collection, addDoc, getDocs, getDoc, setDoc, doc } from "firebase/firestore";
+import { db } from "../../../config/firebase";
+
 const AddScrap = ({ id }) => {
   const isSmallScreen = useMediaQuery("(max-width:600px)");
   const [expanded, setExpanded] = useState(false); //to manage the dropdown of add scrap
@@ -31,9 +35,25 @@ const AddScrap = ({ id }) => {
   const onPriceInput = (e) => {
     setInputPrice(e.target.value);
   };
-  const onAddSubCat = () => {
-    //  Add to DataBase
-    //inputName and inputPrice has data enterd by user
+
+  const onAddSubCat = async () => {
+    try {
+      const categoryDocRef = doc(db, "categories", id);
+
+      const categoryDocSnap = await getDoc(categoryDocRef);
+      const categoryData = categoryDocSnap.data();
+
+      const newSubCategory = {
+        subcat: inputName,
+        subCatPrice: inputPrice
+      };
+  
+      const updatedSubCategories = [...categoryData.subcategories, newSubCategory];
+      await setDoc(categoryDocRef, { ...categoryData, subcategories: updatedSubCategories });
+      console.log("Subcategory added to Firestore");
+    } catch (error) {
+      console.error("Error adding subcategory to Firestore:", error);
+    }
   };
 
   return (

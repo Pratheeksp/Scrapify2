@@ -10,6 +10,10 @@ import {
   Typography,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
+// import { db } from "../../config/firebase"; // Import your Firebase configuration\
+import { db } from "../../../config/firebase";
+import { doc } from "firebase/firestore";
+import { updateDoc } from "firebase/firestore";
 
 const Display = ({ id, subcat }) => {
   const [editedPrice, setEditedPrice] = useState(null);
@@ -20,12 +24,22 @@ const Display = ({ id, subcat }) => {
     setEditedPrice(value); // Update editedPrice when editing
   };
 
-  const onSavePrice = (index) => {
-    // Here, you can handle saving the edited price
-    console.log("Edited Price:", editedPrice);
+  const onSavePrice = async (index) => {
+    try {
+      // Construct the path to the specific category document
+      const categoryRef = doc(db, "categories", id);
+  
+      // Update the subcategory price in the specific category document
+      await updateDoc(categoryRef, {
+        [`subcategories.${index}.subCatPrice`]: editedPrice,
+      });
+  
+      console.log("Price updated successfully");
+    } catch (error) {
+      console.error("Error updating price:", error);
+    }
+  
     // Reset edited price and index after saving
-
-    //save to DB
     setEditedPrice(null);
     setEditedIndex(null);
   };

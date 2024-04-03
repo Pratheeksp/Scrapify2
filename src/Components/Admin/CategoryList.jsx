@@ -14,7 +14,7 @@ import React, { useState, useEffect } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import CategoryCard from "./CategoryCard";
 import { v4 as uuidv4 } from "uuid";
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc,setDoc, getDocs,doc } from "firebase/firestore";
 import { db } from "../../config/firebase";
 
 const CategoryList = ({ onClick }) => {
@@ -43,8 +43,8 @@ const CategoryList = ({ onClick }) => {
 
   const addCategoryToFirestore = async (newCategory) => {
     try {
-      const categoryCollectionRef = collection(db, "categories");
-      await addDoc(categoryCollectionRef, newCategory);
+      const categoryCollectionRef = doc(db, "categories",newCategory.id);
+      await setDoc(categoryCollectionRef, newCategory);
       console.log("Category added to Firestore");
     } catch (error) {
       console.error("Error adding category to Firestore:", error);
