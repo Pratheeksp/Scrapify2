@@ -15,8 +15,14 @@ import React, { useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 
-
-import { collection, addDoc, getDocs, getDoc, setDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  getDoc,
+  setDoc,
+  doc,
+} from "firebase/firestore";
 import { db } from "../../../config/firebase";
 
 const AddScrap = ({ id }) => {
@@ -45,12 +51,20 @@ const AddScrap = ({ id }) => {
 
       const newSubCategory = {
         subcat: inputName,
-        subCatPrice: inputPrice
+        subCatPrice: inputPrice,
       };
-  
-      const updatedSubCategories = [...categoryData.subcategories, newSubCategory];
-      await setDoc(categoryDocRef, { ...categoryData, subcategories: updatedSubCategories });
+
+      const updatedSubCategories = [
+        ...categoryData.subcategories,
+        newSubCategory,
+      ];
+      await setDoc(categoryDocRef, {
+        ...categoryData,
+        subcategories: updatedSubCategories,
+      });
       console.log("Subcategory added to Firestore");
+      inputName("");
+      inputPrice("");
     } catch (error) {
       console.error("Error adding subcategory to Firestore:", error);
     }
