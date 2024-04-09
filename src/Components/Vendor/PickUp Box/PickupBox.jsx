@@ -14,6 +14,9 @@ import styled from "@emotion/styled";
 import Map from "./Map";
 import ItemPhotos from "./ItemPhotos";
 
+import { db } from "../../../config/firebase";
+import { useEffect } from "react";
+
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
   return <IconButton {...other} />;
