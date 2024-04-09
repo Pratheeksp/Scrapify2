@@ -6,11 +6,37 @@ import { ThemeProvider } from "@mui/system";
 import { createTheme } from "@mui/material/styles";
 import Modal from "./PickUp Box/Modal";
 
+import { useEffect } from "react";
+import { collection } from "firebase/firestore";
+import { db } from "../../config/firebase";
+import { getDocs } from "firebase/firestore";
+
 const theme = createTheme();
 
 const Main = () => {
   const [isOpen, setIsOpen] = useState(false); //Handling Modal
   const [pickupID, setPickupID] = useState(""); //  manage pickupID
+
+  const [pickupData, setPickupData] = useState([]); // Store the fetched pickup data
+
+  useEffect(() => {
+    const fetchPickupData = async () => {
+      try {
+        const pickupCollectionRef = collection(db, "pickupDoc");
+        const querySnapshot = await getDocs(pickupCollectionRef);
+        const data = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setPickupData(data);
+        console.log(data);
+      } catch (error) {
+        console.error("Error fetching pickup data:", error);
+      }
+    };
+
+    fetchPickupData();
+  }, []);
 
   const onClickModal = (val) => {
     setIsOpen(val); //to manage the modal
