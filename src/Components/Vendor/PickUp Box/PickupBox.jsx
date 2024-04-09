@@ -41,18 +41,18 @@ const PickupBox = ({ setIsOpen, pickupId }) => {
     <Box
       sx={{
         marginTop: "5vh",
-        width: expanded ? { md: "30vw", xs: "60vw" } : 200,
+        width: expanded ? { md: "30vw", xs: "70vw" } : 200,
       }}
     >
       <Card>
         <CardActions disableSpacing>
-          <Box sx={{ height: { md: "4vh" } }}>
+          <Box sx={{ height: { md: "3vh" } }}>
             <Typography variant="body2" color="text.secondary">
               Pickup ID:{pickupId} {/* Displaying Pick up Id */}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Type: Metal {/* Displaying Type of metal(ML-part) */}
-            </Typography>
+            {/* <Typography variant="body2" color="text.secondary"> */}
+            {/* Type: Metal    Displaying Type of metal(ML-part) */}
+            {/* </Typography> */}
           </Box>
           <ExpandMore
             expand={expanded}
@@ -74,7 +74,7 @@ const PickupBox = ({ setIsOpen, pickupId }) => {
               <Card elevation={3}>
                 <CardActions disableSpacing>
                   <Typography variant="body2" color="text.secondary">
-                    Location
+                    Location : Vijayanagar 3rd Stage
                   </Typography>
                   <ExpandMore
                     expand={expandedMap}
@@ -114,11 +114,12 @@ const PickupBox = ({ setIsOpen, pickupId }) => {
     </Box>
   );
 
-  if (pickupId !== "") {
-    return pickupBox;
-  } else {
-    return null;
-  }
+  // if (pickupId !== "") {
+  //   return pickupBox;
+  // } else {
+  //   return null;
+  // }
+  return pickupBox;
 };
 
 export default PickupBox;
