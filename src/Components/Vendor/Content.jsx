@@ -32,7 +32,7 @@ const Main = () => {
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
           {[122, 223, 73, 44, 115, 336, 117].map((item) => (
             <Box key={item} width={{ xs: "100%", md: "calc(50% - 8px)" }}>
-              <PickupBox pickupId={item} setIsOpen={onClickModal} />
+              <PickupBox pickupId={item} setIsOpen={onClickModal} />                      
             </Box>
           ))}
         </Box>

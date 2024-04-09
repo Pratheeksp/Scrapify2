@@ -1,12 +1,11 @@
-
-import { Box, Button, Divider, Stack, Typography } from "@mui/material";
+import { Box, Divider, Typography } from "@mui/material";
 import React from "react";
-import Navbar from "../Navbar"
+import Navbar from "../Navbar";
 function PrevPickup() {
   const pickups = [
     {
-      orderId: 1, 
-      date: "2022-01-15",     
+      orderId: 1,
+      date: "2022-01-15",
       totalPrice: 150,
       scrapsSold: [
         { item: "Paper", quantity: 10 },
@@ -35,9 +34,9 @@ function PrevPickup() {
 
   return (
     <>
-    <Navbar title={"Home"} />
+      <Navbar title={"Home"} />
       <Box>
-        {pickups.length != 0 ? (
+        {pickups.length !== 0 ? (
           <>
             <Box
               sx={{
@@ -71,12 +70,8 @@ function PrevPickup() {
                     <Typography color={"grey"}>Id: {pick.orderId}</Typography>
                   </Box>
 
-                  <Typography
-
-                    fontWeight={"bolder"}
-                    fontSize={"20px"}
-                  >
-                   Amount: &#8377;&nbsp;{pick.totalPrice}
+                  <Typography fontWeight={"bolder"} fontSize={"20px"}>
+                    Amount: &#8377;&nbsp;{pick.totalPrice}
                   </Typography>
                   <Divider sx={{ margin: "2vh 0" }} />
 
@@ -105,9 +100,7 @@ function PrevPickup() {
                       justifyContent: "end",
                       marginTop: "2vh",
                     }}
-                  >
-                
-                  </Box>
+                  ></Box>
                 </Box>
               ))}
             </Box>
@@ -123,9 +116,7 @@ function PrevPickup() {
                 marginTop: "25vh",
               }}
             >
-              <Typography width={"60vw"}>
-                No Previous Pickups
-              </Typography>
+              <Typography width={"60vw"}>No Previous Pickups</Typography>
               {/* <Button
                 sx={{
                   textTransform: "none",
