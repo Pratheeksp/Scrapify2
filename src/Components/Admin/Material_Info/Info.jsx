@@ -1,22 +1,25 @@
 import React from "react";
 import Display from "./Display";
 import AddScrap from "./AddScrap";
-import { Grid, useMediaQuery } from "@mui/material";
+import { Box, useMediaQuery } from "@mui/material";
 
 const Info = ({ id, subCat }) => {
   // Use media query hook to check if the screen size is small
   const isSmallScreen = useMediaQuery("(max-width:600px)");
 
   return (
-    <Grid
-      container
-      direction="column"
-      justifyContent={isSmallScreen ? "center" : "flex-start"}
-      alignItems={isSmallScreen ? "center" : "flex-start"}
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "flex-start",
+        alignItems: "flex-start",
+        marginLeft: { xs: "9%", md: 0 },
+      }}
     >
       <AddScrap id={id} />
       <Display id={id} subcat={subCat} />
-    </Grid>
+    </Box>
   );
 };
 

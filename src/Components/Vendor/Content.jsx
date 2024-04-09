@@ -1,4 +1,4 @@
-import { Box, Grid } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import React, { useState } from "react";
 import PickupReq from "./PickupReq";
 import PickupBox from "./PickUp Box/PickupBox";
@@ -20,29 +20,22 @@ const Main = () => {
     <ThemeProvider theme={theme}>
       <Box
         sx={{
-          marginLeft: { md: "8vh" },
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
-          // alignItems: "center",
-          width: "200%",
+          width: { md: "70vw" },
         }}
       >
-        <PickupReq
-          pickupId={(id) => {
-            setPickupID(id); // Set pickupID, Id  the vendor hay typed in search bar
-          }}
-        />
+        <Typography variant="h4" sx={{ margin: "50px 0 " }}>
+          Pickup Request
+        </Typography>
 
-        <Grid container spacing={2} sx={{ width: "100%" }}>
-          {[1, 2, 3, 4, 5].map((item) => (
-            <Grid key={item} item xs={12} md={6}>
-              <Box sx={{ marginBottom: 2 }}>
-                <PickupBox pickupId={pickupID} setIsOpen={onClickModal} />
-              </Box>
-            </Grid>
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+          {[122, 223, 73, 44, 115, 336, 117].map((item) => (
+            <Box key={item} width={{ xs: "100%", md: "calc(50% - 8px)" }}>
+              <PickupBox pickupId={item} setIsOpen={onClickModal} />
+            </Box>
           ))}
-        </Grid>
+        </Box>
       </Box>
 
       <Modal

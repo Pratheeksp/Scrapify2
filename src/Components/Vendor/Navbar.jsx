@@ -4,8 +4,18 @@ import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
+import { useNavigate } from "react-router-dom";
 
-export default function ButtonAppBar() {
+export default function ButtonAppBar({title}) {
+const navigate = useNavigate();
+
+const handleNavigate =() => {
+  if( title === 'MyPickups') {
+    navigate('/vendor/pickup');
+  }else {
+    navigate("/vendor")
+  }
+}
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -13,7 +23,7 @@ export default function ButtonAppBar() {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Scrapify
           </Typography>
-          <Button color="inherit">Login</Button>
+          <Button color="inherit"onClick={handleNavigate} >{title}</Button>
         </Toolbar>
       </AppBar>
     </Box>
