@@ -10,6 +10,8 @@ import {
 } from "@mui/material";
 import { Delete } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import axios from "axios";
 
 //assuming I fetch data like from database
 
@@ -24,6 +26,8 @@ const itemsArray = [
 const Bill = () => {
   const [billItems, setBillItems] = useState([]);
   const navigate = useNavigate();
+  const location = useLocation();
+  const { email,pickupId } = location.state; 
 
   const handleAddItem = () => {
     const newItem = {
@@ -34,6 +38,7 @@ const Bill = () => {
     };
     setBillItems([...billItems, newItem]);
   };
+
 
   const handleItemChange = (index, field, value) => {
     const updatedItems = billItems.map((item, i) => {
@@ -67,9 +72,31 @@ const Bill = () => {
     setBillItems(updatedItems);
   };
 
-  const handlePayment = () => {
-    navigate("/payment", { state: { billItems } });
-  };
+  const FinalPrice = billItems.reduce((total, item) => total + item.tprice, 0);
+
+
+
+
+    const handlePayment = async (e) => {
+    
+      const response = await axios.post("http://localhost:8080/payment", {
+        //update the actual details that are fetched (to=email),upiid,name,oredrid
+        amount: FinalPrice,
+        from: "onboarding@resend.dev",
+        to: email,
+        subject: "Scrapify Invoice",
+        customerupi:"7829926870@paytm",
+        customername:"RohanAchar",
+        contact:'7829926870',
+        billItems,
+        pickupid:pickupId,
+      });
+  
+      console.log(response.data);
+  
+    };
+  
+
 
   const totalPrice = billItems.reduce((total, item) => total + item.tprice, 0);
 

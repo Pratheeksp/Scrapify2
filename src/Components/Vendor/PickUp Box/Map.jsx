@@ -3,12 +3,12 @@ import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import "./MapStyles.css";
 import { Icon } from "leaflet";
-const Map = () => {
-  const [location, setLocation] = useState({
-    //latitude and longitude
-    latitude: 12.33892,
-    longitude: 76.612219,
-  });
+const Map = ({location}) => {
+  // const [dbLocation, setDbLocation] = useState({
+  //   //latitude and longitude
+  //   latitude: 12.33892,
+  //   longitude: 76.612219,
+  // });                                  // In case the data changes and want to manipulate the data accordingly we can use state in the future
   const customIcon = new Icon({
     iconUrl: require("../Assets/mapIcon.png"),
     iconSize: [38, 38],
