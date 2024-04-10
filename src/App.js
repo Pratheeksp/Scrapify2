@@ -12,6 +12,7 @@ import Dashboard from "./Components/Admin/PaymentDashboard/Dashboard";
 import VendorTable from "./Components/Admin/Vendor_Info/VendorTable";
 import VendorInfo from "./Components/Admin/Vendor_Info/VendorInfo";
 import PrevPickup from "./Components/Vendor/PrevPickup/PrevPickup";
+import Profile from "./Components/Vendor/VednorProfile/Profile"
 function App() {
   return (
     // <Box sx={{ flexGrow: 1 }}>
@@ -34,6 +35,8 @@ function App() {
         <Route index element={<Vendor />} />
         <Route path="bill" element={<Bill2 />} />
         <Route path="pickup" element={<PrevPickup />} />
+        <Route path="profile" element={<Profile />} />
+
       </Route>
       <Route path="/payment" element={<Payment />} />
     </Routes>

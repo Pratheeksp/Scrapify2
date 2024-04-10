@@ -6,7 +6,7 @@ import Navbar from "./Navbar";
 const Vendor = () => {
   return (
     <Box sx={{ flexGrow: 1 }}>
-    <Navbar title={"MyPickups"}/>
+    <Navbar nav1={"My Pickups"} nav2={"My Profile"}/>
     <Box
       sx={{
         display: "flex",

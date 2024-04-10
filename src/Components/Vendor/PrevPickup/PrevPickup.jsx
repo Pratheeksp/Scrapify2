@@ -34,7 +34,7 @@ function PrevPickup() {
 
   return (
     <>
-      <Navbar title={"Home"} />
+      <Navbar nav1={"Home"} nav2={"My Profile"} />
       <Box>
         {pickups.length !== 0 ? (
           <>

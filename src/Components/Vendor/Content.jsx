@@ -1,10 +1,9 @@
 import { Box, Typography } from "@mui/material";
 import React, { useState } from "react";
-import PickupReq from "./PickupReq";
+// import PickupReq from "./PickupReq";
 import PickupBox from "./PickUp Box/PickupBox";
 import { ThemeProvider } from "@mui/system";
 import { createTheme } from "@mui/material/styles";
-import Modal from "./PickUp Box/Modal";
 
 import { useEffect } from "react";
 import { collection } from "firebase/firestore";
@@ -14,8 +13,7 @@ import { getDocs } from "firebase/firestore";
 const theme = createTheme();
 
 const Main = () => {
-  const [isOpen, setIsOpen] = useState(false); //Handling Modal
-  const [pickupID, setPickupID] = useState(""); //  manage pickupID
+  // const [pickupID, setPickupID] = useState(""); //  manage pickupID
 
   const [pickupData, setPickupData] = useState([]); // Store the fetched pickup data
 
@@ -29,7 +27,7 @@ const Main = () => {
           ...doc.data(),
         }));
         setPickupData(data);
-        console.log(data);
+
       } catch (error) {
         console.error("Error fetching pickup data:", error);
       }
@@ -37,10 +35,6 @@ const Main = () => {
 
     fetchPickupData();
   }, []);
-
-  const onClickModal = (val) => {
-    setIsOpen(val); //to manage the modal
-  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -51,24 +45,27 @@ const Main = () => {
           width: { md: "70vw" },
         }}
       >
-        <Typography variant="h4" sx={{ margin: "50px 0 " }}>
+        <Typography variant="h4" sx={{ margin: "50px 0 ", alignSelf: "" }}>
           Pickup Request
         </Typography>
 
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-          {[122, 223, 73, 44, 115, 336, 117].map((item) => (
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 2,
+            position: "relative",
+            right: { md: "100px", xs: "50px" },
+          }}
+        >
+          {pickupData.map((item) => (
             <Box key={item} width={{ xs: "100%", md: "calc(50% - 8px)" }}>
-              <PickupBox pickupId={item} setIsOpen={onClickModal} />                      
+              <PickupBox pickupId={item.id} data={item} />
+              {/* mapping the data coming for DB and setting the id for each box from the db  */}
             </Box>
           ))}
         </Box>
       </Box>
-
-      <Modal
-        open={isOpen}
-        onClose={() => setIsOpen(false)}
-        pickupID={pickupID}
-      />
     </ThemeProvider>
   );
 };

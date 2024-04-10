@@ -13,6 +13,8 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import styled from "@emotion/styled";
 import Map from "./Map";
 import ItemPhotos from "./ItemPhotos";
+import Modal from "./Modal";
+
 
 import { db } from "../../../config/firebase";
 import { useEffect } from "react";
@@ -28,9 +30,11 @@ const ExpandMore = styled((props) => {
   }),
 }));
 
-const PickupBox = ({ setIsOpen, pickupId }) => {
+const PickupBox = ({  pickupId, data }) => {
   const [expanded, setExpanded] = useState(false);
   const [expandedMap, setExpandedMap] = useState(false);
+  const [isOpen, setIsOpen] = useState(false); //Handling Modal
+
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -41,6 +45,14 @@ const PickupBox = ({ setIsOpen, pickupId }) => {
   };
 
   const pickupBox = (
+    <>
+     <Modal
+        open={isOpen}
+        onClose={() => setIsOpen(false)}
+        pickupID={data.id}
+        dbOtp={data.otp}
+        email={data.email}
+      />
     <Box
       sx={{
         marginTop: "5vh",
@@ -51,7 +63,7 @@ const PickupBox = ({ setIsOpen, pickupId }) => {
         <CardActions disableSpacing>
           <Box sx={{ height: { md: "3vh" } }}>
             <Typography variant="body2" color="text.secondary">
-              Pickup ID:{pickupId} {/* Displaying Pick up Id */}
+              Pickup ID:{pickupId.substring(0, 2)} {/* Displaying Pick up Id */}
             </Typography>
             {/* <Typography variant="body2" color="text.secondary"> */}
             {/* Type: Metal    Displaying Type of metal(ML-part) */}
@@ -77,7 +89,7 @@ const PickupBox = ({ setIsOpen, pickupId }) => {
               <Card elevation={3}>
                 <CardActions disableSpacing>
                   <Typography variant="body2" color="text.secondary">
-                    Location : Vijayanagar 3rd Stage
+                    {data.address.addressLine2}
                   </Typography>
                   <ExpandMore
                     expand={expandedMap}
@@ -95,13 +107,18 @@ const PickupBox = ({ setIsOpen, pickupId }) => {
                 >
                   <CardContent>
                     <Box sx={{ height: "30vh" }}>
-                      <Map />
+                      <Map
+                        location={{
+                          latitude: data.latitude,
+                          longitude: data.longitude,
+                        }}
+                      />
                     </Box>
                   </CardContent>
                 </Collapse>
               </Card>
 
-              <ItemPhotos />
+              <ItemPhotos photoLink={data.images}/>
               <Box>
                 <Button
                   sx={{ margin: "2vh  0" }}
@@ -115,6 +132,8 @@ const PickupBox = ({ setIsOpen, pickupId }) => {
         </Collapse>
       </Card>
     </Box>
+    </>
+    
   );
 
   // if (pickupId !== "") {
