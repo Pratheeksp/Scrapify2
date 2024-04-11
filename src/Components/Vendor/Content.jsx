@@ -18,16 +18,38 @@ const Main = () => {
   const [pickupData, setPickupData] = useState([]); // Store the fetched pickup data
 
   useEffect(() => {
+    // const fetchPickupData = async () => {
+    //   try {
+    //     const pickupCollectionRef = collection(db, "pickupDoc");
+    //     const querySnapshot = await getDocs(pickupCollectionRef);
+    //     const data = querySnapshot.docs.map((doc) => ({
+    //       id: doc.id,
+    //       ...doc.data(),
+    //     }));
+    //     setPickupData(data);
+
+    //   } catch (error) {
+    //     console.error("Error fetching pickup data:", error);
+    //   }
+    // };
     const fetchPickupData = async () => {
       try {
+        const vendorId = "vendor123"; // Replace with actual vendor ID
         const pickupCollectionRef = collection(db, "pickupDoc");
         const querySnapshot = await getDocs(pickupCollectionRef);
         const data = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
-        setPickupData(data);
+        console.log(data);
 
+        // Filter out reserved pickup requests
+        const availablePickups = data.filter(
+          (pickup) =>
+            pickup.reservedBy === null || pickup.reservedBy === vendorId
+        );
+
+        setPickupData(availablePickups);
       } catch (error) {
         console.error("Error fetching pickup data:", error);
       }
