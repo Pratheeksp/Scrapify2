@@ -13,7 +13,7 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 
-///
+
 
 import { auth } from "../../config/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -65,15 +65,17 @@ export default function SignUp() {
             console.error('Error adding/updating document: ', error);
           }
     
-          localStorage.setItem('user_email', email);
-          localStorage.setItem('uid', user.uid);
+          localStorage.setItem('admin_email', email);
+          localStorage.setItem('adminid', user.uid);
           navigate('/admin');
         } catch (error) {
           console.error('Error signing up:', error.message);
           setError(error.message);
         }
-        navigate("/admin");
-      } else {
+        // navigate("/admin");
+      } 
+      
+      else {
         try {
           setError(null);
 
@@ -95,6 +97,7 @@ export default function SignUp() {
               name: name,
               phone: phone,
               email: email,
+              profile:"",
               type: "vendor"
             });
     
@@ -103,14 +106,14 @@ export default function SignUp() {
             console.error('Error adding/updating document: ', error);
           }
     
-          localStorage.setItem('user_email', email);
-          localStorage.setItem('uid', user.uid);
+          localStorage.setItem('vendor_email', email);
+          localStorage.setItem('vid', user.uid);
           navigate('/vendor');
         } catch (error) {
           console.error('Error signing up:', error.message);
           setError(error.message);
         }
-        navigate("/vendor");
+        // navigate("/vendor");
       }
     } catch (err) {
       setError("Error signing up");

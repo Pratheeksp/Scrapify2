@@ -1,7 +1,6 @@
 import { CloudUpload } from "@mui/icons-material";
 import {
   Avatar,
-  AvatarGroup,
   Box,
   Button,
   Dialog,
@@ -10,18 +9,59 @@ import {
   DialogTitle,
   Divider,
   IconButton,
-  TextField,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
-import Navbar from "../Navbar"
+import React, { useState, useEffect } from "react";
+import { db } from "../../../config/firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { v4 as uuidv4 } from "uuid"; // Import v4 as uuidv4 alias
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { imgDB } from "../../../config/firebase";
+import {useNavigate} from "react-router-dom"
 
-function Dialog1({ open1, handleClose }) {
-  const [VendorDetails, setVendorDetails] = useState([]);
+function Dialog1({ open1, handleClose, setProfileImg }) {
+  const [imageSrc, setImageSrc] = useState(null);
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const uploadedImageSrc = reader.result;
+        setImageSrc(uploadedImageSrc);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImageSrc(null);
+  };
+
+  const handleSave = async () => {
+    try {
+      const storageRef = ref(imgDB, `Imgs2/${uuidv4()}`); // Use uuidv4 to generate unique ID
+
+      const imageData = await fetch(imageSrc).then((res) => res.blob());
+      await uploadBytes(storageRef, imageData);
+      const downloadURL = await getDownloadURL(storageRef);
+      console.log("Download URL:", downloadURL);
+      setProfileImg(downloadURL); // Update profile image URL
+
+      const vid = localStorage.getItem("vid");
+      const userDocRef = doc(db, "users", vid);
+
+      // Update profile information in Firestore
+      await setDoc(userDocRef, { profile: downloadURL }, { merge: true });
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    }
+
+    handleClose();
+  };
+
   return (
-    <>
     <Dialog open={open1} onClose={handleClose}>
-      <DialogTitle>Edit Image and Name</DialogTitle>
+      <DialogTitle>Edit Image </DialogTitle>
       <DialogContent
         sx={{
           display: "flex",
@@ -34,73 +74,38 @@ function Dialog1({ open1, handleClose }) {
           accept="image/*"
           id="contained-button-file"
           type="file"
-          //   onChange={handleFileChange}
+          onChange={handleFileChange}
           style={{ display: "none" }}
         />
         <label htmlFor="contained-button-file">
           <IconButton component="span">
             <Avatar
               sx={{
-                width: { xs: "100px", sm: "200px", md: "1000px" },
-                height: { xs: "100px", sm: "200px", md: "1000px" },
+                width: { xs: "100px", sm: "200px" },
+                height: { xs: "100px", sm: "200px" },
               }}
             >
-              <CloudUpload />
+              {imageSrc ? (
+                <img
+                  src={imageSrc}
+                  alt="Uploaded"
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              ) : (
+                <CloudUpload />
+              )}
             </Avatar>
           </IconButton>
         </label>
-        <TextField
-          margin="dense"
-          id="name"
-          label="Name"
-          fullWidth
-          //   value={name}
-          //   onChange={(e) => setName(e.target.value)}
-        />
+        {imageSrc && (
+          <Button variant="outlined" onClick={handleRemoveImage} sx={{ mt: 1 }}>
+            Change
+          </Button>
+        )}
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
-        <Button variant="contained" color="primary">
-          Save
-        </Button>
-      </DialogActions>
-    </Dialog>
-    </>
-  );
-}
-
-function Dialog2({ open2, handleClose }) {
-  return (
-    <Dialog open={open2} onClose={handleClose}>
-      <DialogTitle>Edit mobile and email</DialogTitle>
-      <DialogContent
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <TextField
-          margin="dense"
-          id="name"
-          label="Mobile number"
-          fullWidth
-          //   value={name}
-          //   onChange={(e) => setName(e.target.value)}
-        />
-        <TextField
-          margin="dense"
-          id="name"
-          label="Email address"
-          fullWidth
-          //   value={name}
-          //   onChange={(e) => setName(e.target.value)}
-        />
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose}>Cancel</Button>
-        <Button variant="contained" color="primary">
+        <Button variant="contained" color="primary" onClick={handleSave}>
           Save
         </Button>
       </DialogActions>
@@ -109,17 +114,51 @@ function Dialog2({ open2, handleClose }) {
 }
 
 function Profile() {
-  const [open1, setopen1] = useState(false);
-  const [open2, setopen2] = useState(false);
+  const [profileImg, setProfileImg] = useState(null);
+  const [open1, setOpen1] = useState(false);
+  const [userData, setUserData] = useState(null);
+  const navigate = useNavigate();
 
   const handleClose = () => {
-    setopen1(false);
-    setopen2(false);
+    setOpen1(false);
+  };
+
+  useEffect(() => {
+    const vid = localStorage.getItem("vid");
+    // const vid = "5QEKR2Oyl4WTjpIS1x0PNXXmXl52";
+
+    if (vid) {
+      const getUserData = async () => {
+        try {
+          const userDocRef = doc(db, "vendor", vid);
+          const userDoc = await getDoc(userDocRef);
+
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            setUserData(userData);
+            setProfileImg(userData.profileImg); // Set profile image URL
+          } else {
+            console.log("vendor document does not exist");
+          }
+        } catch (error) {
+          console.error("Error fetching vendor data:", error.message);
+        }
+      };
+
+      getUserData();
+    } else {
+      console.log("Vendor UID not found in local storage");
+    }
+  }, []);
+
+  const onLogout = () => {
+    localStorage.removeItem("vid");
+    localStorage.removeItem("vendor_email");
+    navigate("/")
+    
   };
   return (
     <>
-    <Navbar nav1={"My Pickups"} nav2={"Home"}/>
-
       <Box
         sx={{
           width: { xs: "90vw", sm: "80vw", md: "60vw" },
@@ -137,9 +176,10 @@ function Profile() {
         >
           <Avatar
             sx={{ width: { xs: "150px", sm: "250px" }, height: "auto" }}
+            src={userData ? userData.profile : "Loading..."}
           ></Avatar>
           <Typography sx={{ m: "2vh 0", fontSize: { xs: "18px", sm: "24px" } }}>
-            Rohan
+            {userData ? userData.name : "Loading..."}
           </Typography>
           <Button
             sx={{
@@ -149,62 +189,34 @@ function Profile() {
               "&:hover": { backgroundColor: "transparent" },
             }}
             disableRipple
-            onClick={() => setopen1(true)}
+            onClick={() => setOpen1(true)}
           >
             Change
           </Button>
         </Box>
-        <Dialog1 open1={open1} handleClose={handleClose} />
-        <Dialog2 open2={open2} handleClose={handleClose} />
+        <Dialog1
+          open1={open1}
+          handleClose={handleClose}
+          setProfileImg={setProfileImg}
+        />
         <Divider />
-        <Box mt={"4vh"}>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              margin: "2vh 0",
-            }}
-          >
+        <Box mt={"4vh"} sx={{ textAlign: "center" }}>
+          <Box sx={{ margin: "2vh 0" }}>
             <Box>
               <Typography sx={{ color: "grey" }}>Mobile number</Typography>
-              <Typography>9999999999</Typography>
+              <Typography>
+                {userData ? userData.phone : "Loading..."}
+              </Typography>
             </Box>
-            <Button
-              sx={{
-                color: "green",
-                fontWeight: "bold",
-                textTransform: "none",
-                "&:hover": { backgroundColor: "transparent" },
-              }}
-              disableRipple
-              onClick={() => setopen2(true)}
-            >
-              Change
-            </Button>
           </Box>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              margin: "2vh 0",
-            }}
-          >
+          <Box sx={{ margin: "2vh 0" }}>
             <Box>
               <Typography sx={{ color: "grey" }}>Email address</Typography>
-              <Typography>qwertyu@gmail.com</Typography>
+              <Typography>
+                {userData ? userData.email : "Loading..."}
+              </Typography>
             </Box>
-            <Button
-              sx={{
-                color: "green",
-                fontWeight: "bold",
-                textTransform: "none",
-                "&:hover": { backgroundColor: "transparent" },
-              }}
-              disableRipple
-              onClick={() => setopen2(true)}
-            >
-              Change
-            </Button>
+            <Button onClick={onLogout}>Logout</Button>
           </Box>
         </Box>
       </Box>

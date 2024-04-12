@@ -34,7 +34,6 @@ const Main = () => {
     // };
     const fetchPickupData = async () => {
       try {
-        const vendorId = "vendor123"; // Replace with actual vendor ID
         const pickupCollectionRef = collection(db, "pickupDoc");
         const querySnapshot = await getDocs(pickupCollectionRef);
         const data = querySnapshot.docs.map((doc) => ({
@@ -44,6 +43,8 @@ const Main = () => {
         console.log(data);
 
         // Filter out reserved pickup requests
+        const vendorId = "vendor123"; // Replace with actual vendor ID
+
         const availablePickups = data.filter(
           (pickup) =>
             pickup.reservedBy === null || pickup.reservedBy === vendorId
@@ -67,7 +68,10 @@ const Main = () => {
           width: { md: "70vw" },
         }}
       >
-        <Typography variant="h4" sx={{ margin: "50px 0 ", alignSelf: "" }}>
+        <Typography
+          variant="h4"
+          sx={{ margin: "50px 0 ", alignSelf: "center" }}
+        >
           Pickup Request
         </Typography>
 
@@ -76,12 +80,16 @@ const Main = () => {
             display: "flex",
             flexWrap: "wrap",
             gap: 2,
-            position: "relative",
+
             right: { md: "100px", xs: "50px" },
           }}
         >
           {pickupData.map((item) => (
-            <Box key={item} width={{ xs: "100%", md: "calc(50% - 8px)" }}>
+            <Box
+              key={item}
+              width={{ xs: "100%", md: "calc(50% - 8px)"}}
+              sx={{display:"flex",justifyContent:"center",alignItems:"center"}}
+            >
               <PickupBox pickupId={item.id} data={item} />
               {/* mapping the data coming for DB and setting the id for each box from the db  */}
             </Box>

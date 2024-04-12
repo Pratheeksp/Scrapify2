@@ -15,14 +15,7 @@ import PrevPickup from "./Components/Vendor/PrevPickup/PrevPickup";
 import Profile from "./Components/Vendor/VednorProfile/Profile"
 function App() {
   return (
-    // <Box sx={{ flexGrow: 1 }}>
-    //   <Navbar />
-    //   <Grid container>
-    //     <Grid item margin={7} xs={4} sx={{ md: { margin: "10000px" } }}>
-    //       <Content />
-    //     </Grid>
-    //   </Grid>
-    // </Box>
+  
     <Routes>
       <Route path="/" element={<SignIn />} />
       <Route path="/signup" element={<SignUp />} />
@@ -36,8 +29,8 @@ function App() {
         <Route path="bill" element={<Bill2 />} />
         <Route path="pickup" element={<PrevPickup />} />
         <Route path="profile" element={<Profile />} />
-
       </Route>
+
       <Route path="/payment" element={<Payment />} />
     </Routes>
   );

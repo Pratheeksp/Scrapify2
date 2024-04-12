@@ -69,14 +69,15 @@ const PickupBox = ({ pickupId, data }) => {
       <Box
         sx={{
           marginTop: "5vh",
-          width: expanded ? { md: "30vw", xs: "70vw" } : 200,
+          // width: expanded ? { md: "30vw", xs: "70vw" } : 200,
+          width: { md: "30vw", xs: "70vw" },
         }}
       >
         <Card>
           <CardActions disableSpacing>
             <Box sx={{ height: { md: "3vh" } }}>
               <Typography variant="body2" color="text.secondary">
-                Pickup ID:{pickupId.substring(0, 2)}{" "}
+                Pickup ID:{pickupId}
                 {/* Displaying Pick up Id */}
               </Typography>
               {/* <Typography variant="body2" color="text.secondary"> */}
