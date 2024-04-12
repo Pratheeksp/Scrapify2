@@ -15,7 +15,7 @@ const Vendor = () => {
         height: "100vh", // Set the height to 100% of the viewport height for vertical centering
       }}
     >
-      <Box sx={{ width: "40%" }}>
+      <Box >
         <Content />
       </Box>
     </Box>

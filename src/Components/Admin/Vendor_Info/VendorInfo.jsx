@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
   Box,
@@ -16,12 +16,33 @@ import { Avatar } from "@mui/material";
 import Navbar from "../Navbar";
 import man from "./man.png";
 
+import { db } from "../../../config/firebase";
+import { collection, doc, getDoc } from "firebase/firestore";
+
 const VendorInfo = () => {
   // Access URL parameters
   const { id } = useParams();
+  const [vendor, setVendor] = useState([]);
+  useEffect(() => {
+    const fetchVendorData = async () => {
+      try {
+        const vendorDocRef = doc(db, "vendor", id);
+        const docSnap = await getDoc(vendorDocRef);
+        if (docSnap.exists()) {
+          const vendorData = { id: docSnap.id, ...docSnap.data() };
+          setVendor(vendorData);
+        } else {
+          console.log("No such document!");
+        }
+      } catch (error) {
+        console.error("Error fetching vendor data:", error);
+      }
+    };
 
-  // Find the vendor object with the matching id
-  const vendor = vendors.find((vendor) => vendor.id === parseInt(id));
+    if (id) {
+      fetchVendorData();
+    }
+  }, [id]);
 
   return (
     <>
@@ -59,18 +80,18 @@ const VendorInfo = () => {
             <Typography
               sx={{ lineHeight: 2, fontSize: { md: "18px ", xs: "13px" } }}
             >
-              Contact: {vendor.contactNumber}
+              Contact: {vendor.phone}
             </Typography>
-            <Typography
+            {/* <Typography
               sx={{ lineHeight: 2, fontSize: { md: "18px", xs: "13px" } }}
             >
               Address: {vendor.address}
-            </Typography>
+            </Typography> */}
           </Box>
           <Box sx={{ flexGrow: "3", display: "flex" }}>
             <Avatar
               alt="Remy Sharp"
-              src={man}
+              src=""
               sx={{
                 width: { md: 140, xs: 80 },
                 height: { md: 140, xs: 80 },
@@ -86,7 +107,7 @@ const VendorInfo = () => {
         >
           Previous Pickups
         </Typography>
-        <Box>
+       { null === null ?<Typography sx={{fontWeight:"bold",margin:"10px 30px"}}> No Previous Pickup </Typography>: <Box>
           <TableContainer
             component={Paper}
             sx={{ margin: "20px", width: { md: "50%", xs: "90%" } }}
@@ -100,17 +121,17 @@ const VendorInfo = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {vendor.pickupHistory.map((pickup) => (
+                {/* {vendor.pickupHistory.map((pickup) => (
                   <TableRow key={pickup.pickupId}>
                     <TableCell>{pickup.pickupId}</TableCell>
                     <TableCell>{pickup.amount}</TableCell>
                     <TableCell>{pickup.customerName}</TableCell>
                   </TableRow>
-                ))}
+                ))} */}
               </TableBody>
             </Table>
           </TableContainer>
-        </Box>
+        </Box> }
       </Box>
     </>
   );

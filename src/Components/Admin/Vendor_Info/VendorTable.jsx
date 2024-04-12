@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Table,
@@ -11,6 +11,13 @@ import {
   Typography,
 } from "@mui/material";
 import Navbar from "../Navbar";
+
+import { db } from "../../../config/firebase";
+
+import { collection } from "firebase/firestore";
+
+import { getDocs } from "firebase/firestore";
+
 export const vendors = [
   {
     id: 1,
@@ -41,9 +48,30 @@ export const vendors = [
 ];
 
 const VendorList = () => {
+  const [vendorDetails, setVendorDetails] = useState([]);
+
+  useEffect(() => {
+    const fetchVendorDetails = async () => {
+      try {
+        const pickupCollectionRef = collection(db, "vendor");
+        const querySnapshot = await getDocs(pickupCollectionRef);
+        const data = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        setVendorDetails(data);
+      } catch (error) {
+        console.error("Error fetching pickup data:", error);
+      }
+    };
+
+    fetchVendorDetails();
+  }, []);
+
   return (
     <>
-      <Navbar  nav1={"dashboard"} nav2={"home"}/>
+      <Navbar nav1={"dashboard"} nav2={"home"} />
       <Typography
         align="center"
         variant="h3"
@@ -69,11 +97,11 @@ const VendorList = () => {
             <TableRow>
               <TableCell>VendorId</TableCell>
               <TableCell>Vendor Name</TableCell>
-              <TableCell>Address</TableCell>
+              <TableCell>Email</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {vendors.map((vendor) => (
+            {vendorDetails.map((vendor) => (
               <TableRow
                 key={vendor.id}
                 component={Link}
@@ -82,7 +110,7 @@ const VendorList = () => {
               >
                 <TableCell>{vendor.id}</TableCell>
                 <TableCell>{vendor.name}</TableCell>
-                <TableCell>{vendor.address}</TableCell>
+                <TableCell>{vendor.email}</TableCell>
               </TableRow>
             ))}
           </TableBody>

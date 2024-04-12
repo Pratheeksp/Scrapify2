@@ -38,8 +38,12 @@ export default function SignIn({ setUserEmail }) {
 
       if ((userType === "admin" && userData.type === "admin") || (userType === "vendor" && userData.type === "vendor")) {
         if (userType === "admin") {
+          localStorage.setItem('admin_email', email);
+          localStorage.setItem('adminid', user.uid);
           navigate('/admin');
         } else {
+          localStorage.setItem('vendor_email', email);
+          localStorage.setItem('vid', user.uid);
           navigate('/vendor');
         }
       } else {
