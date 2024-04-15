@@ -37,7 +37,7 @@ const PickupBox = ({ pickupId, data }) => {
 
   const handleReserve = async () => {
     try {
-      const vendorId = "vendor123"; // Replace with actual vendor ID
+      const vendorId = localStorage.getItem("vid"); // Replace with actual vendor ID
 
       const pickupRef = doc(db, "pickupDoc", data.id); // Reference to the specific pickup document
       await updateDoc(pickupRef, {
