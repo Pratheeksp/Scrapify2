@@ -98,6 +98,7 @@ export default function SignUp() {
               phone: phone,
               email: email,
               profile:"",
+
               type: "vendor"
             });
     
