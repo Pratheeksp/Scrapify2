@@ -32,12 +32,15 @@ const ExpandMore = styled((props) => {
 const PickupBox = ({ pickupId, data }) => {
   const [expanded, setExpanded] = useState(false);
   const [expandedMap, setExpandedMap] = useState(false);
-  const [isOpen, setIsOpen] = useState(false); //Handling Modal
+  const [isOpen, setIsOpen] = useState(false); // Handling Modal
   const [isReserved, setIsReserved] = useState(false);
 
+
   const handleReserve = async () => {
+
+
     try {
-      const vendorId = localStorage.getItem("vid"); // Replace with actual vendor ID
+      const vendorId = localStorage.getItem("vid");
 
       const pickupRef = doc(db, "pickupDoc", data.id); // Reference to the specific pickup document
       await updateDoc(pickupRef, {
@@ -48,6 +51,8 @@ const PickupBox = ({ pickupId, data }) => {
       console.error("Error reserving pickup:", error);
     }
   };
+
+
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -80,9 +85,6 @@ const PickupBox = ({ pickupId, data }) => {
                 Pickup ID:{pickupId}
                 {/* Displaying Pick up Id */}
               </Typography>
-              {/* <Typography variant="body2" color="text.secondary"> */}
-              {/* Type: Metal    Displaying Type of metal(ML-part) */}
-              {/* </Typography> */}
             </Box>
             <ExpandMore
               expand={expanded}
@@ -135,13 +137,19 @@ const PickupBox = ({ pickupId, data }) => {
 
                 <ItemPhotos photoLink={data.images} />
                 <Box>
-                  <Button
-                    sx={{ margin: "2vh  0" }}
-                    onClick={() => setIsOpen(true)}
-                  >
-                    Bill
-                  </Button>
-                  <Button onClick={handleReserve}>Reserve</Button>
+                  {!isReserved && (
+                    <Button
+                      sx={{ margin: "2vh  0" }}
+                      onClick={handleReserve}
+                    >
+                      Take the pickup
+                    </Button>
+                  )}
+                  {isReserved && (
+                    <Button sx={{ margin: "2vh  0" }} onClick={() => setIsOpen(true)}>
+                      Bill
+                    </Button>
+                  )}
                 </Box>
               </Box>
             </CardContent>
@@ -151,11 +159,6 @@ const PickupBox = ({ pickupId, data }) => {
     </>
   );
 
-  // if (pickupId !== "") {
-  //   return pickupBox;
-  // } else {
-  //   return null;
-  // }
   return pickupBox;
 };
 
