@@ -1,63 +1,47 @@
-import { Box, Typography } from "@mui/material";
-import React, { useState } from "react";
-// import PickupReq from "./PickupReq";
-import PickupBox from "./PickUp Box/PickupBox";
-import { ThemeProvider } from "@mui/system";
+import React, { useState, useEffect } from "react";
+import { Box, Typography, ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
-
-import { useEffect } from "react";
-import { collection } from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../../config/firebase";
-import { getDocs } from "firebase/firestore";
+import PickupBox from "./PickUp Box/PickupBox";
 
 const theme = createTheme();
 
-const Main = () => {
-  // const [pickupID, setPickupID] = useState(""); //  manage pickupID
-
+const Content = () => {
   const [pickupData, setPickupData] = useState([]); // Store the fetched pickup data
+  const vendorId = localStorage.getItem("vid");
 
   useEffect(() => {
-    // const fetchPickupData = async () => {
-    //   try {
-    //     const pickupCollectionRef = collection(db, "pickupDoc");
-    //     const querySnapshot = await getDocs(pickupCollectionRef);
-    //     const data = querySnapshot.docs.map((doc) => ({
-    //       id: doc.id,
-    //       ...doc.data(),
-    //     }));
-    //     setPickupData(data);
-
-    //   } catch (error) {
-    //     console.error("Error fetching pickup data:", error);
-    //   }
-    // };
     const fetchPickupData = async () => {
       try {
         const pickupCollectionRef = collection(db, "pickupDoc");
-        const querySnapshot = await getDocs(pickupCollectionRef);
-        const data = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        console.log(data);
 
-        // Filter out reserved pickup requests
-        const vendorId =  localStorage.getItem("vid");  // Replace with actual vendor ID
+        // Subscribe to real-time updates
+        const unsubscribe = onSnapshot(pickupCollectionRef, (querySnapshot) => {
+          const updatedPickups = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
 
-        const availablePickups = data.filter(
-          (pickup) =>
-            pickup.reservedBy === null || pickup.reservedBy === vendorId
-        );
+          // Filter out pickups reserved by other vendors or already completed transactions
+          const availablePickups = updatedPickups.filter((pickup) => {
+            return pickup.reservedBy === vendorId || pickup.reservedBy === null;
+          });
 
-        setPickupData(availablePickups);
+          setPickupData(availablePickups);
+        });
+
+        return () => {
+          // Unsubscribe from real-time updates when component unmounts
+          unsubscribe();
+        };
       } catch (error) {
         console.error("Error fetching pickup data:", error);
       }
     };
 
     fetchPickupData();
-  }, []);
+  }, [vendorId]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -80,18 +64,15 @@ const Main = () => {
             display: "flex",
             flexWrap: "wrap",
             gap: 2,
-
-            right: { md: "100px", xs: "50px" },
           }}
         >
           {pickupData.map((item) => (
             <Box
-              key={item}
-              width={{ xs: "100%", md: "calc(50% - 8px)"}}
-              sx={{display:"flex",justifyContent:"center",alignItems:"center"}}
+              key={item.id} // Use item.id as key
+              width={{ xs: "100%", md: "calc(50% - 8px)" }}
+              sx={{ display: "flex", justifyContent: "center" }}
             >
               <PickupBox pickupId={item.id} data={item} />
-              {/* mapping the data coming for DB and setting the id for each box from the db  */}
             </Box>
           ))}
         </Box>
@@ -100,4 +81,4 @@ const Main = () => {
   );
 };
 
-export default Main;
+export default Content;
