@@ -15,6 +15,7 @@ import { db } from "../../../config/firebase";
 import { collection, onSnapshot } from "firebase/firestore";
 import TablePagination from "@mui/material/TablePagination";
 import TableSortLabel from "@mui/material/TableSortLabel";
+import axios from "axios";
 
 const StyledTableContainer = styled(TableContainer)`
   max-width: 100%;
@@ -25,6 +26,17 @@ const StyledTable = styled(Table)`
   min-width: 650px;
 `;
 
+const BalanceWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+`;
+
+const BalanceText = styled(Typography)`
+  font-size: 24px;
+  font-weight: bold;
+`;
+
 const Dashboard = () => {
   const [details, setDetails] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,6 +45,8 @@ const Dashboard = () => {
   const [totalRows, setTotalRows] = useState(0);
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("");
+  const [balance, setBalance] = useState(null);
+  const paymentDetails = [];
 
   const fetchData = async () => {
     try {
@@ -42,23 +56,23 @@ const Dashboard = () => {
 
       // Create a real-time listener for the "payment" collection
       const unsubscribe = onSnapshot(paymentCollectionRef, (snapshot) => {
-        const paymentDetails = [];
 
         snapshot.forEach((doc) => {
           const paymentData = doc.data();
           const id = doc.id;
 
           // Format createdAt timestamp
-          const createdAt = new Date(
-            paymentData.date.toDate()
-          ).toLocaleString("en-US", {
-            month: "short",
-            day: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true,
-          });
+          const createdAt = new Date(paymentData.date.toDate()).toLocaleString(
+            "en-US",
+            {
+              month: "short",
+              day: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true,
+            }
+          );
 
           paymentDetails.push({
             id,
@@ -68,12 +82,21 @@ const Dashboard = () => {
         });
 
         // Sort the details by orderBy and order
-        const sortedDetails = stableSort(paymentDetails, getComparator(order, orderBy));
+        const sortedDetails = stableSort(
+          paymentDetails,
+          getComparator(order, orderBy)
+        );
 
         setTotalRows(sortedDetails.length);
-        const paginatedDetails = sortedDetails.slice(page * rowsPerPage, (page + 1) * rowsPerPage);
+        const paginatedDetails = sortedDetails.slice(
+          page * rowsPerPage,
+          (page + 1) * rowsPerPage
+        );
         setDetails(paginatedDetails);
         setLoading(false); // Hide loader after data is fetched
+
+        // Fetch balance when new data is fetched
+        // fetchBal();
       });
 
       return () => {
@@ -88,6 +111,20 @@ const Dashboard = () => {
   useEffect(() => {
     fetchData();
   }, [page, rowsPerPage, orderBy, order]); // Fetch data when page, rowsPerPage, orderBy, or order changes
+
+  // Function to fetch balance
+  useEffect( () => {
+    const fetchBal = async () => {
+      try {
+        const balanceResponse = await axios.get("http://localhost:8080/getBalance");
+        setBalance(balanceResponse.data.items[0].balance / 100);
+      } catch (error) {
+        console.error("Error fetching balance:", error.message);
+      }
+    };
+    fetchBal();
+  },[paymentDetails])
+  
 
   const handleRequestSort = (property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -172,6 +209,7 @@ const Dashboard = () => {
               </TableBody>
             </StyledTable>
           </StyledTableContainer>
+
           <TablePagination
             sx={{ marginRight: { md: "200px", sm: "20px" } }}
             rowsPerPageOptions={[5, 10, 25]}
@@ -185,6 +223,9 @@ const Dashboard = () => {
               setPage(0);
             }}
           />
+          <BalanceWrapper>
+            <BalanceText>Balance: {balance}</BalanceText>
+          </BalanceWrapper>
         </>
       )}
     </>
