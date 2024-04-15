@@ -11,6 +11,7 @@ import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
 import Navbar from "../Navbar";
 import { Typography } from "@mui/material";
+import TablePagination from "@mui/material/TablePagination";
 
 const StyledTableContainer = styled(TableContainer)`
   max-width: 100%;
@@ -23,14 +24,21 @@ const StyledTable = styled(Table)`
 
 const Dashboard = () => {
   const [details, setDetails] = useState([]);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [totalRows, setTotalRows] = useState(0);
 
   const fetchData = async () => {
     try {
-      const response = await fetch("http://localhost:8080/getdetails");
+      const skip = page * rowsPerPage;
+      const count = rowsPerPage;
+      const url = `http://localhost:8080/getdetails?count=${count}&skip=${skip}`;
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error("Failed to fetch data");
       }
       const data = await response.json();
+      // console.log(data.items);
       setDetails(
         data.items.map((item) => ({
           ...item,
@@ -46,15 +54,15 @@ const Dashboard = () => {
           ),
         }))
       );
+      setTotalRows(data.totalCount); // Update totalRows
     } catch (error) {
       console.error("Error:", error.message);
     }
   };
 
   useEffect(() => {
-    const interval = setInterval(fetchData, 5000); // Fetch data every 5 seconds
-    return () => clearInterval(interval); // Cleanup interval on component unmount
-  }, []);
+    fetchData();
+  }, [page, rowsPerPage]);
 
   return (
     <>
@@ -75,33 +83,50 @@ const Dashboard = () => {
           <LinearProgress />
         </Box>
       ) : (
-        <StyledTableContainer
-          component={Paper}
-          sx={{
-            width: { md: "80%", xs: "100%" },
-          }}
-        >
-          <StyledTable aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell style={{ minWidth: "150px" }}>Created at</TableCell>
-                <TableCell style={{ minWidth: "150px" }}>Payment ID</TableCell>
-                <TableCell style={{ minWidth: "150px" }}>Amount</TableCell>
-                <TableCell style={{ minWidth: "150px" }}>Status</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {details.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell>{item.formattedDateTime}</TableCell>
-                  <TableCell>{item.id}</TableCell>
-                  <TableCell>{item.amount / 100}</TableCell>
-                  <TableCell>{item.status}</TableCell>
+        <>
+          <StyledTableContainer
+            component={Paper}
+            sx={{
+              width: { md: "80%", xs: "100%" },
+            }}
+          >
+            <StyledTable aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell style={{ minWidth: "150px" }}>
+                    Created at
+                  </TableCell>
+                  <TableCell style={{ minWidth: "150px" }}>Payment ID</TableCell>
+                  <TableCell style={{ minWidth: "150px" }}>Amount</TableCell>
+                  <TableCell style={{ minWidth: "150px" }}>Status</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </StyledTable>
-        </StyledTableContainer>
+              </TableHead>
+              <TableBody>
+                {details.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell>{item.formattedDateTime}</TableCell>
+                    <TableCell>{item.id}</TableCell>
+                    <TableCell>{item.amount / 100}</TableCell>
+                    <TableCell>{item.status}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </StyledTable>
+          </StyledTableContainer>
+          <TablePagination
+            sx={{ marginRight: { md: "200px", sm: "20px" } }}
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={30}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={(event, newPage) => setPage(newPage)}
+            onRowsPerPageChange={(event) => {
+              setRowsPerPage(parseInt(event.target.value, 10));
+              setPage(0);
+            }}
+          />
+        </>
       )}
     </>
   );

@@ -43,7 +43,7 @@ const Main = () => {
         console.log(data);
 
         // Filter out reserved pickup requests
-        const vendorId = "vendor123"; // Replace with actual vendor ID
+        const vendorId =  localStorage.getItem("vid");  // Replace with actual vendor ID
 
         const availablePickups = data.filter(
           (pickup) =>

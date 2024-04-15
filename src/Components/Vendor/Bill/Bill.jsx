@@ -1,19 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
   Button,
   TextField,
-  Select,
-  MenuItem,
+  Autocomplete,
   Divider,
 } from "@mui/material";
 import { Delete } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 
-//assuming I fetch data like from database
+import { db } from "../../../config/firebase";
+import { collection, getDocs, query, where, addDoc } from "firebase/firestore";
 
 const itemsArray = [
   { subcat: "Steel", subCatPrice: 15.5 },
@@ -25,9 +24,9 @@ const itemsArray = [
 
 const Bill = () => {
   const [billItems, setBillItems] = useState([]);
-  const navigate = useNavigate();
   const location = useLocation();
-  const { email,pickupId } = location.state; 
+  const { email, pickupId } = location.state;
+  const [customerInfo, setCustomerInfo] = useState({});
 
   const handleAddItem = () => {
     const newItem = {
@@ -39,12 +38,13 @@ const Bill = () => {
     setBillItems([...billItems, newItem]);
   };
 
-
   const handleItemChange = (index, field, value) => {
     const updatedItems = billItems.map((item, i) => {
       if (i === index) {
         if (field === "subcat") {
-          const selectedItem = itemsArray.find((item) => item.subcat === value);
+          const selectedItem = itemsArray.find(
+            (item) => item.subcat === value
+          );
           return {
             ...item,
             [field]: value,
@@ -53,7 +53,6 @@ const Bill = () => {
           };
         } else if (field === "quantity" && value !== "") {
           const quantity = Number(value);
-          console.log(quantity, item);
           return {
             ...item,
             [field]: quantity,
@@ -74,29 +73,65 @@ const Bill = () => {
 
   const FinalPrice = billItems.reduce((total, item) => total + item.tprice, 0);
 
+  const [userId, setUserId] = useState(null);
 
+  useEffect(() => {
+    const fetchCustomerId = async () => {
+      try {
+        const usersCollectionRef = collection(db, "users");
+        const querySnapshot = await getDocs(
+          query(usersCollectionRef, where("email", "==", email))
+        );
 
-
-    const handlePayment = async (e) => {
-    
-      const response = await axios.post("http://localhost:8080/payment", {
-        //update the actual details that are fetched (to=email),upiid,name,oredrid
-        amount: FinalPrice,
-        from: "onboarding@resend.dev",
-        to: email,
-        subject: "Scrapify Invoice",
-        customerupi:"7829926870@paytm",
-        customername:"RohanAchar",
-        contact:'7829926870',
-        billItems,
-        pickupid:pickupId,
-      });
-  
-      console.log(response.data);
-  
+        if (!querySnapshot.empty) {
+          querySnapshot.forEach((doc) => {
+            setCustomerInfo(doc.data());
+            setUserId(doc.id);
+          });
+        } else {
+          console.log("No matching user found!");
+        }
+      } catch (err) {
+        console.error("Error fetching user document:", err);
+      }
     };
-  
 
+    fetchCustomerId();
+  }, [email]);
+
+  const handlePayment = async () => {
+    const response = await axios.post("http://localhost:8080/payment", {
+      amount: FinalPrice,
+      from: "onboarding@resend.dev",
+      to: email,
+      subject: "Scrapify Invoice",
+      customerupi: "7829926870@paytm",
+      customername: customerInfo.name,
+      contact: customerInfo.phone,
+      billItems,
+      pickupid: pickupId,
+    });
+
+    console.log("response", response.data);
+
+    const vendorId = localStorage.getItem("vid");
+    try {
+      const paymentDocRef = collection(db, "payment");
+
+      await addDoc(paymentDocRef, {
+        pickupId,
+        vendorId,
+        userId,
+        paymentId: response.data.payId,
+        amount: FinalPrice,
+        material_info: billItems,
+      });
+
+      console.log("Payment information stored successfully.");
+    } catch (err) {
+      console.error("Error adding paymentDoc to Firestore:", err);
+    }
+  };
 
   const totalPrice = billItems.reduce((total, item) => total + item.tprice, 0);
 
@@ -117,30 +152,33 @@ const Bill = () => {
       >
         {billItems.map((item, index) => (
           <Box key={index} sx={{ display: "flex", gap: 2 }}>
-            <Select
-              //   label="Item Name"
-              value={item.subcat}
-              onChange={(e) =>
-                handleItemChange(index, "subcat", e.target.value)
-              }
+            <Autocomplete
+              disablePortal
+              disableClearable
+              options={itemsArray.filter(
+                (item) => !billItems.some((i) => i.subcat === item.subcat)
+              )}
+              getOptionLabel={(option) => option.subcat}
               sx={{ flex: 2 }}
-            >
-              {itemsArray.map((item) => (
-                <MenuItem key={item.subcat} value={item.subcat}>
-                  {item.subcat}
-                </MenuItem>
-              ))}
-            </Select>
+              onChange={(e, newValue) =>
+                handleItemChange(
+                  index,
+                  "subcat",
+                  newValue ? newValue.subcat : ""
+                )
+              }
+              renderInput={(params) => (
+                <TextField {...params} label="Item Name" />
+              )}
+            />
             <TextField
-              //  label="Quantity"
-              placeholder={item.quantity}
+              placeholder={item.quantity.toString()}
               onChange={(e) =>
                 handleItemChange(index, "quantity", e.target.value)
               }
               sx={{ flex: 1 }}
             />
             <TextField
-              //   label="Price"
               value={item.tprice}
               disabled
               sx={{ flex: 1 }}
