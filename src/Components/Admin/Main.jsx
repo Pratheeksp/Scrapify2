@@ -12,7 +12,7 @@ const Main = () => {
     setSelectedSubCat(subCat);
   };
   return (
-    <Box flexGrow={1} p={4} sx={{marginLeft:{md:"20%",xs:"9%"}}}>
+    <Box flexGrow={1} p={4} sx={{marginLeft:{md:"20%"}}}>
       <CategoryList onClick={onClickCat} />
       <Divider sx={{ margin: "40px 0" }} />
       {selectedSubCat && <Info id={selectedId} subCat={selectedSubCat}  />}

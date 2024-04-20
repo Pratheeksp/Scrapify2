@@ -51,16 +51,15 @@ const Dashboard = () => {
   const fetchData = async () => {
     try {
       setLoading(true); // Display loader while fetching data
-
+  
       const paymentCollectionRef = collection(db, "payment");
-
-      // Create a real-time listener for the "payment" collection
       const unsubscribe = onSnapshot(paymentCollectionRef, (snapshot) => {
-
+        const newPaymentDetails = []; // Create a new array to store the payment details
+  
         snapshot.forEach((doc) => {
           const paymentData = doc.data();
           const id = doc.id;
-
+  
           // Format createdAt timestamp
           const createdAt = new Date(paymentData.date.toDate()).toLocaleString(
             "en-US",
@@ -73,20 +72,20 @@ const Dashboard = () => {
               hour12: true,
             }
           );
-
-          paymentDetails.push({
+  
+          newPaymentDetails.push({
             id,
             ...paymentData,
             createdAt,
           });
         });
-
+  
         // Sort the details by orderBy and order
         const sortedDetails = stableSort(
-          paymentDetails,
+          newPaymentDetails,
           getComparator(order, orderBy)
         );
-
+  
         setTotalRows(sortedDetails.length);
         const paginatedDetails = sortedDetails.slice(
           page * rowsPerPage,
@@ -94,11 +93,8 @@ const Dashboard = () => {
         );
         setDetails(paginatedDetails);
         setLoading(false); // Hide loader after data is fetched
-
-        // Fetch balance when new data is fetched
-        // fetchBal();
       });
-
+  
       return () => {
         // Unsubscribe from the real-time listener when component unmounts
         unsubscribe();
@@ -107,6 +103,7 @@ const Dashboard = () => {
       console.error("Error fetching data:", error.message);
     }
   };
+  
 
   useEffect(() => {
     fetchData();

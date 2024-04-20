@@ -13,9 +13,12 @@ import {
   RadioGroup,
   FormControlLabel,
   Stack,
+  InputAdornment,
+  Autocomplete,
 } from "@mui/material";
 import { Delete } from "@mui/icons-material";
 import { useLocation } from "react-router-dom";
+import PaymentModal from "./PaymentModal";
 import axios from "axios";
 
 import { db } from "../../../config/firebase";
@@ -28,51 +31,43 @@ import {
   Timestamp,
 } from "firebase/firestore";
 
-const itemsArray = [
-  { subcat: "Steel", subCatPrice: 15.5 },
-  { subcat: "Aluminum", subCatPrice: 12.75 },
-  { subcat: "Copper", subCatPrice: 20.0 },
-  { subcat: "Iron", subCatPrice: 10.25 },
-  { subcat: "Gold", subCatPrice: 150.0 },
-];
-
 const Bill = () => {
   const [billItems, setBillItems] = useState([]);
-  const [paymentMethod, setPaymentMethod] = useState("UPI");
-  const location = useLocation();
-  const { email, pickupId } = location.state;
-  const [customerInfo, setCustomerInfo] = useState({});
-  const [userId, setUserId] = useState(null);
+  const [subcategoryData, setSubcategoryData] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false); // State to manage modal visibility
 
   useEffect(() => {
-    const fetchCustomerId = async () => {
+    const fetchSubcategories = async () => {
       try {
-        const usersCollectionRef = collection(db, "users");
-        const querySnapshot = await getDocs(
-          query(usersCollectionRef, where("email", "==", email))
-        );
+        const categoriesCollectionRef = collection(db, "categories");
+        const querySnapshot = await getDocs(query(categoriesCollectionRef));
 
-        if (!querySnapshot.empty) {
-          querySnapshot.forEach((doc) => {
-            setCustomerInfo(doc.data());
-            setUserId(doc.id);
+        const subcategories = [];
+        querySnapshot.forEach((doc) => {
+          const categoryData = doc.data();
+          categoryData.subcategories.forEach((subcategory) => {
+            subcategories.push({
+              subcat: subcategory.subcat,
+              subCatPrice: subcategory.subCatPrice,
+              unit: subcategory.unit,
+            });
           });
-        } else {
-          console.log("No matching user found!");
-        }
-      } catch (err) {
-        console.error("Error fetching user document:", err);
+        });
+        setSubcategoryData(subcategories);
+      } catch (error) {
+        console.error("Error fetching subcategories:", error);
       }
     };
 
-    fetchCustomerId();
-  }, [email]);
+    fetchSubcategories();
+  }, []);
 
   const handleAddItem = () => {
     const newItem = {
       subcat: "",
       quantity: 1,
       price: "",
+      unit: "",
       tprice: "",
     };
     setBillItems([...billItems, newItem]);
@@ -82,16 +77,18 @@ const Bill = () => {
     const updatedItems = billItems.map((item, i) => {
       if (i === index) {
         if (field === "subcat") {
-          const selectedItem = itemsArray.find((item) => item.subcat === value);
+          const selectedItem = subcategoryData.find(
+            (subcategory) => subcategory.subcat === value
+          );
           return {
             ...item,
             [field]: value,
             price: selectedItem.subCatPrice,
+            unit: selectedItem.unit, // Add the unit here
             tprice: 0,
           };
         } else if (field === "quantity" && value !== "") {
           const quantity = Number(value);
-          console.log(quantity, item);
           return {
             ...item,
             [field]: quantity,
@@ -111,136 +108,92 @@ const Bill = () => {
   };
   const totalPrice = billItems.reduce((total, item) => total + item.tprice, 0);
 
-  const FinalPrice = billItems.reduce((total, item) => total + item.tprice, 0);
-
-  const handlePayment = async () => {
-    // Add logic based on payment method (cash or UPI)
-    let payId = null;
-    try {
-      if (paymentMethod === "UPI") {
-        const response = await axios.post("http://localhost:8080/payment", {
-          amount: FinalPrice,
-          from: "onboarding@resend.dev",
-          to: email,
-          subject: "Scrapify Invoice",
-          customerupi: "7829926870@paytm",
-          customername: customerInfo.name,
-          contact: customerInfo.phone,
-          billItems,
-          pickupid: pickupId,
-        });
-        console.log("response", response.data);
-        payId = response.data.payId;
-        console.log(payId);
-      }
-
-      // Update database with payment information
-      const vendorId = localStorage.getItem("vid");
-
-      const paymentDocRef = collection(db, "payment");
-
-      const currentDate = new Date();
-      const firestoreTimestamp = Timestamp.fromDate(currentDate);
-
-      await addDoc(paymentDocRef, {
-        pickupId,
-        vendorId,
-        userId,
-        amount: FinalPrice,
-        material_info: billItems,
-        paymentId: payId,
-        mode: paymentMethod,
-        date: firestoreTimestamp,
-        status:paymentMethod === "UPI" ? "processing" : "processed"
-      });
-      console.log("Payment information stored successfully.");
-    } catch (error) {
-      console.error("Error processing payment:", error);
-    }
+  const handlePay = () => {
+    setIsModalOpen(true); // Open the modal when "Pay" button is clicked
   };
 
   return (
-    <Box sx={{ margin: "40px 0 " }}>
-      <Typography variant="h4" sx={{ textAlign: "center" }}>
-        Bill
-      </Typography>
-      <Divider sx={{ margin: "5vh 0" }} />
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-          width: { xs: "90vw", sm: "70vw" },
-          margin: "auto",
-        }}
-      >
-        {billItems.map((item, index) => (
-          <Box key={index} sx={{ display: "flex", gap: 2 }}>
-            <Select
-              value={item.subcat}
-              onChange={(e) =>
-                handleItemChange(index, "subcat", e.target.value)
-              }
-              sx={{ flex: 2 }}
-            >
-              {itemsArray.map((item) => (
-                <MenuItem key={item.subcat} value={item.subcat}>
-                  {item.subcat}
-                </MenuItem>
-              ))}
-            </Select>
-            <TextField
-              placeholder={item.quantity}
-              onChange={(e) =>
-                handleItemChange(index, "quantity", e.target.value)
-              }
-              sx={{ flex: 1 }}
-            />
-            <TextField value={item.tprice} disabled sx={{ flex: 1 }} />
-            <Delete onClick={() => handleDelete(index)} sx={{ flex: 0.5 }} />
-          </Box>
-        ))}
-        {billItems.length !== 0 && (
-          <>
-            <Divider />
-            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-              <Typography>Total :</Typography>
-              <Typography> &#8377;{totalPrice}</Typography>
+    <>
+      <Box sx={{ margin: "40px 0 " }}>
+        <Typography variant="h4" sx={{ textAlign: "center" }}>
+          Bill
+        </Typography>
+        <Divider sx={{ margin: "5vh 0" }} />
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            width: { xs: "90vw", sm: "70vw" },
+            margin: "auto",
+          }}
+        >
+          {billItems.map((item, index) => (
+            <Box key={index} sx={{ display: "flex", gap: 2 }}>
+              <Autocomplete
+                disablePortal
+                disableClearable
+                options={subcategoryData.filter(
+                  (subcategory) =>
+                    !billItems.some(
+                      (item) => item.subcat === subcategory.subcat
+                    )
+                )}
+                getOptionLabel={(option) => option.subcat}
+                sx={{ flex: 2 }}
+                onChange={(e, newValue) =>
+                  handleItemChange(
+                    index,
+                    "subcat",
+                    newValue ? newValue.subcat : ""
+                  )
+                }
+                renderInput={(params) => <TextField {...params} />}
+              />
+              <TextField
+                value={item.quantity}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">{item.unit}</InputAdornment>
+                  ),
+                }}
+                onChange={(e) =>
+                  handleItemChange(index, "quantity", e.target.value)
+                }
+                sx={{ flex: 1 }}
+              />
+              <TextField value={item.tprice} disabled sx={{ flex: 1 }} />
+              <Delete onClick={() => handleDelete(index)} sx={{ flex: 0.5 }} />
             </Box>
-            <Divider />
-          </>
-        )}
-        <Button variant="contained" onClick={handleAddItem}>
-          Add Item
-        </Button>
-        {billItems.length !== 0 && (
-          <Box sx={{ display: "flex", columnGap: "20px" }}>
-            <Typography sx={{ justifySelf: "center", alignSelf: "center" }}>
-              Payment Method:
-            </Typography>
-            <FormControl component="fieldset">
-              <RadioGroup
-                row
-                aria-label="payment-method"
-                name="payment-method"
-                value={paymentMethod}
-                onChange={(e) => setPaymentMethod(e.target.value)}
-              >
-                <FormControlLabel value="UPI" control={<Radio />} label="UPI" />
-                <FormControlLabel
-                  value="CASH"
-                  control={<Radio />}
-                  label="Cash"
-                />
-              </RadioGroup>
-            </FormControl>
-          </Box>
-        )}
-        <Button variant="outlined" onClick={handlePayment}>
-          Pay
-        </Button>
+          ))}
+
+          {billItems.length !== 0 && (
+            <>
+              <Divider />
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Typography>Total :</Typography>
+                <Typography> &#8377;{totalPrice}</Typography>
+              </Box>
+              <Divider />
+            </>
+          )}
+          <Button variant="contained" onClick={handleAddItem}>
+            Add Item
+          </Button>
+          <Button variant="outlined" onClick={handlePay}>
+            Pay
+          </Button>
+        </Box>
       </Box>
-    </Box>
+      {/* Render PaymentModal only when isModalOpen is true */}
+      {isModalOpen && (
+        <PaymentModal
+          totalPrice={totalPrice}
+          billItems={billItems}
+          onClose={() => setIsModalOpen(false)} // Pass a function to close the modal
+        />
+      )}
+    </>
   );
 };
 

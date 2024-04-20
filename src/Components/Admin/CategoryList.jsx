@@ -57,6 +57,7 @@ const CategoryList = ({ onClick }) => {
         id: uuidv4(),
         cat: input,
         subcategories: [],
+      
       };
 
       setCategories((prevCategories) => [...prevCategories, newCategory]);
