@@ -16,7 +16,7 @@ import ItemPhotos from "./ItemPhotos";
 import Modal from "./Modal";
 
 import { db } from "../../../config/firebase";
-import { doc, updateDoc } from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore";
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -29,30 +29,26 @@ const ExpandMore = styled((props) => {
   }),
 }));
 
-const PickupBox = ({ pickupId, data }) => {
+const PickupBox = ({ pickupId, data, reserve }) => {
   const [expanded, setExpanded] = useState(false);
   const [expandedMap, setExpandedMap] = useState(false);
   const [isOpen, setIsOpen] = useState(false); // Handling Modal
-  const [isReserved, setIsReserved] = useState(false);
-
+  // const [reserve, setreserve] = useState(false);
+  console.log("Inside PickupBox", pickupId);
 
   const handleReserve = async () => {
-
-
     try {
       const vendorId = localStorage.getItem("vid");
-
-      const pickupRef = doc(db, "pickupDoc", data.id); // Reference to the specific pickup document
-      await updateDoc(pickupRef, {
+      const pickupRef = collection(db, "reserve"); // Reference to the specific pickup document
+      await addDoc(pickupRef, {
+        pickupId,
         reservedBy: vendorId, // Update the reserved field to true
       });
-      setIsReserved(true);
+      // setreserve(true);
     } catch (error) {
       console.error("Error reserving pickup:", error);
     }
   };
-
-
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -62,7 +58,7 @@ const PickupBox = ({ pickupId, data }) => {
     setExpandedMap(!expandedMap);
   };
 
-  const pickupBox = (
+  return (
     <>
       <Modal
         open={isOpen}
@@ -74,16 +70,24 @@ const PickupBox = ({ pickupId, data }) => {
       <Box
         sx={{
           marginTop: "5vh",
-          // width: expanded ? { md: "30vw", xs: "70vw" } : 200,
           width: { md: "30vw", xs: "70vw" },
         }}
       >
-        <Card>
+        <Card
+          sx={{
+            boxShadow: reserve
+              ? "0px 4px 8px rgba(0, 0, 255, 0.2)"
+              : "0px 4px 8px rgba(0, 0, 0, 0.2)",
+          }}
+        >
           <CardActions disableSpacing>
             <Box sx={{ height: { md: "3vh" } }}>
-              <Typography variant="body2" color="text.secondary">
-                Pickup ID:{pickupId}
-                {/* Displaying Pick up Id */}
+              <Typography
+                variant="body2"
+                color={reserve ? "primary.light" : "text.secondary"}
+              >
+                Pickup ID: {pickupId}
+                Reserve :{reserve.toString()}
               </Typography>
             </Box>
             <ExpandMore
@@ -137,16 +141,16 @@ const PickupBox = ({ pickupId, data }) => {
 
                 <ItemPhotos photoLink={data.images} />
                 <Box>
-                  {!isReserved && (
-                    <Button
-                      sx={{ margin: "2vh  0" }}
-                      onClick={handleReserve}
-                    >
-                      Take the pickup
+                  {!reserve && (
+                    <Button sx={{ margin: "2vh  0" }} onClick={handleReserve}>
+                      Reserve
                     </Button>
                   )}
-                  {isReserved && (
-                    <Button sx={{ margin: "2vh  0" }} onClick={() => setIsOpen(true)}>
+                  {reserve && (
+                    <Button
+                      sx={{ margin: "2vh  0" }}
+                      onClick={() => setIsOpen(true)}
+                    >
                       Bill
                     </Button>
                   )}
@@ -158,8 +162,6 @@ const PickupBox = ({ pickupId, data }) => {
       </Box>
     </>
   );
-
-  return pickupBox;
 };
 
 export default PickupBox;

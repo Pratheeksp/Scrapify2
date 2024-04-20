@@ -10,6 +10,7 @@ import {
   useMediaQuery,
   Collapse,
   Stack,
+  Box,
 } from "@mui/material";
 import React, { useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
@@ -30,7 +31,7 @@ const AddScrap = ({ id }) => {
   const [expanded, setExpanded] = useState(false); //to manage the dropdown of add scrap
   const [inputName, setInputName] = useState("");
   const [inputPrice, setInputPrice] = useState(0);
-
+  const [inputUnit, setInputUnit] = useState(0);
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
@@ -40,6 +41,9 @@ const AddScrap = ({ id }) => {
   };
   const onPriceInput = (e) => {
     setInputPrice(e.target.value);
+  };
+  const onUnitInput = (e) => {
+    setInputUnit(e.target.value);
   };
 
   const onAddSubCat = async () => {
@@ -52,6 +56,7 @@ const AddScrap = ({ id }) => {
       const newSubCategory = {
         subcat: inputName,
         subCatPrice: inputPrice,
+        unit: inputUnit,
       };
 
       const updatedSubCategories = [
@@ -63,8 +68,9 @@ const AddScrap = ({ id }) => {
         subcategories: updatedSubCategories,
       });
       console.log("Subcategory added to Firestore");
-      inputName("");
-      inputPrice("");
+      setInputName("");
+      setInputPrice(0);
+      setInputUnit(0);
     } catch (error) {
       console.error("Error adding subcategory to Firestore:", error);
     }
@@ -85,7 +91,10 @@ const AddScrap = ({ id }) => {
           direction="row"
           alignItems="center"
           spacing={2}
-          sx={{ marginBottom: expanded ? "20px" : "0" }}
+          sx={{
+            marginBottom: expanded ? "20px" : "0",
+            width: { md: "250px", xs: "200px" },
+          }}
         >
           <Typography
             sx={{
@@ -119,24 +128,33 @@ const AddScrap = ({ id }) => {
         <CardContent
           sx={{
             marginTop: "10px",
-            display: "grid",
-            gridTemplateColumns: "repeat(2, minmax(40px, 1fr))",
+            display: "flex",
+            flexDirection: "column",
             gap: 1.5,
-            width: "200px", //Change the width of the form box
+            width: { md: "250px", xs: "200px" }, //Change the width of the form box
           }}
         >
+          <Box sx={{ display: "flex", columnGap: { md: "30px", xs: "20px" } }}>
+            <FormControl>
+              <FormLabel>Name</FormLabel>
+              <Input
+                sx={{ fontSize: isSmallScreen ? "14px" : "16px" }}
+                onChange={onNameInput}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Price</FormLabel>
+              <Input
+                sx={{ fontSize: isSmallScreen ? "14px" : "16px" }}
+                onChange={onPriceInput}
+              />
+            </FormControl>
+          </Box>
           <FormControl>
-            <FormLabel>Name</FormLabel>
+            <FormLabel>Unit</FormLabel>
             <Input
               sx={{ fontSize: isSmallScreen ? "14px" : "16px" }}
-              onChange={onNameInput}
-            />
-          </FormControl>
-          <FormControl>
-            <FormLabel>Price</FormLabel>
-            <Input
-              sx={{ fontSize: isSmallScreen ? "14px" : "16px" }}
-              onChange={onPriceInput}
+              onChange={onUnitInput}
             />
           </FormControl>
           <CardActions>

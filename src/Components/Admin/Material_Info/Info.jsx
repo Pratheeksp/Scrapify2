@@ -12,9 +12,16 @@ const Info = ({ id, subCat }) => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        justifyContent: "flex-start",
-        alignItems: "flex-start",
-        marginLeft: { xs: "9%", md: 0 },
+        justifyContent: {
+          xs: "center", 
+          md: "flex-start", 
+        },
+        alignItems: {
+          xs: "center", 
+          md: "flex-start", 
+        },
+
+
       }}
     >
       <AddScrap id={id} />

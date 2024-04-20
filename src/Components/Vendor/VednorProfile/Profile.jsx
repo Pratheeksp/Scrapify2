@@ -10,17 +10,19 @@ import {
   Divider,
   IconButton,
   Typography,
+  LinearProgress,
 } from "@mui/material";
 import React, { useState, useEffect } from "react";
-import { db } from "../../../config/firebase";
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { v4 as uuidv4 } from "uuid"; // Import v4 as uuidv4 alias
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { imgDB } from "../../../config/firebase";
-import {useNavigate} from "react-router-dom"
+import Navbar from "../Navbar"
 
-function Dialog1({ open1, handleClose, setProfileImg }) {
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { v4 as uuidv4 } from "uuid";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { imgDB, db } from "../../../config/firebase";
+
+function Dialog1({ open1, handleClose, setProfileImg, setVendorData, setLoadingData }) {
   const [imageSrc, setImageSrc] = useState(null);
+
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -38,30 +40,45 @@ function Dialog1({ open1, handleClose, setProfileImg }) {
   };
 
   const handleSave = async () => {
-    try {
-      const storageRef = ref(imgDB, `Imgs2/${uuidv4()}`); // Use uuidv4 to generate unique ID
 
+    try {
+      const storageRef = ref(imgDB, `Imgs2/${uuidv4()}`);
       const imageData = await fetch(imageSrc).then((res) => res.blob());
       await uploadBytes(storageRef, imageData);
       const downloadURL = await getDownloadURL(storageRef);
       console.log("Download URL:", downloadURL);
-      setProfileImg(downloadURL); // Update profile image URL
-
+      setProfileImg(downloadURL); // Update profile image URL in UI
+  
       const vid = localStorage.getItem("vid");
-      const userDocRef = doc(db, "users", vid);
-
-      // Update profile information in Firestore
-      await setDoc(userDocRef, { profile: downloadURL }, { merge: true });
+      const vendorDocRef = doc(db, "vendor", vid);
+  
+      await setDoc(vendorDocRef, { profile: downloadURL }, { merge: true });
+      handleClose();
+      setLoadingData(true); // Set loading data to true while saving
+  
+      // Refetch the data after saving
+      const updatedVendorDoc = await getDoc(vendorDocRef);
+      if (updatedVendorDoc.exists()) {
+        const updatedVendorData = updatedVendorDoc.data();
+        setVendorData(updatedVendorData);
+      } else {
+        console.log("Updated vendor document does not exist");
+      }
     } catch (error) {
       console.error("Error uploading image:", error);
+    } finally {
+      setTimeout(() => {
+        setLoadingData(false); 
+      },500)// Set loading data back to false after saving
     }
-
-    handleClose();
+  
   };
+  
+  
 
   return (
     <Dialog open={open1} onClose={handleClose}>
-      <DialogTitle>Edit Image </DialogTitle>
+      <DialogTitle>Edit Image</DialogTitle>
       <DialogContent
         sx={{
           display: "flex",
@@ -116,8 +133,8 @@ function Dialog1({ open1, handleClose, setProfileImg }) {
 function Profile() {
   const [profileImg, setProfileImg] = useState(null);
   const [open1, setOpen1] = useState(false);
-  const [userData, setUserData] = useState(null);
-  const navigate = useNavigate();
+  const [vendorData, setVendorData] = useState(null);
+  const [loadingData, setLoadingData] = useState(true);
 
   const handleClose = () => {
     setOpen1(false);
@@ -125,41 +142,44 @@ function Profile() {
 
   useEffect(() => {
     const vid = localStorage.getItem("vid");
-    // const vid = "5QEKR2Oyl4WTjpIS1x0PNXXmXl52";
 
     if (vid) {
-      const getUserData = async () => {
+      const getVendorData = async () => {
         try {
-          const userDocRef = doc(db, "vendor", vid);
-          const userDoc = await getDoc(userDocRef);
+          const vendorDocRef = doc(db, "vendor", vid);
+          const vendorDoc = await getDoc(vendorDocRef);
 
-          if (userDoc.exists()) {
-            const userData = userDoc.data();
-            setUserData(userData);
-            setProfileImg(userData.profileImg); // Set profile image URL
+          if (vendorDoc.exists()) {
+            const vendorData = vendorDoc.data();
+            setVendorData(vendorData); // Set vendorData
+            setProfileImg(vendorData.profileImg);
           } else {
-            console.log("vendor document does not exist");
+            console.log("Vendor document does not exist");
           }
         } catch (error) {
           console.error("Error fetching vendor data:", error.message);
+        } finally {
+          setTimeout(() => {
+            setLoadingData(false);
+          },200)
+
+
+         // Set loadingData to false after fetching
         }
       };
 
-      getUserData();
+      getVendorData();
     } else {
-      console.log("Vendor UID not found in local storage");
+      console.log("Vendor VID not found in local storage");
+      setLoadingData(false);
     }
   }, []);
 
-  const onLogout = () => {
-    localStorage.removeItem("vid");
-    localStorage.removeItem("vendor_email");
-    navigate("/")
-    
-  };
   return (
     <>
-      <Box
+      <Navbar nav1={"My Pickups"} nav2={"Home"}/>
+      {loadingData && <LinearProgress />}
+     { !loadingData && <Box
         sx={{
           width: { xs: "90vw", sm: "80vw", md: "60vw" },
           margin: "5vh auto",
@@ -176,10 +196,10 @@ function Profile() {
         >
           <Avatar
             sx={{ width: { xs: "150px", sm: "250px" }, height: "auto" }}
-            src={userData ? userData.profile : "Loading..."}
+            src={vendorData ? vendorData.profile : "Loading..."}
           ></Avatar>
           <Typography sx={{ m: "2vh 0", fontSize: { xs: "18px", sm: "24px" } }}>
-            {userData ? userData.name : "Loading..."}
+            {vendorData ? vendorData.name : "Loading..."}
           </Typography>
           <Button
             sx={{
@@ -198,28 +218,30 @@ function Profile() {
           open1={open1}
           handleClose={handleClose}
           setProfileImg={setProfileImg}
+          setVendorData={setVendorData} 
+          setLoadingData={setLoadingData} 
         />
         <Divider />
-        <Box mt={"4vh"} sx={{ textAlign: "center" }}>
+        <Box mt={"4vh"} sx={{ }}>
           <Box sx={{ margin: "2vh 0" }}>
-            <Box>
+            <Box sx={{display:"flex" , justifyContent:"space-between"}}>
               <Typography sx={{ color: "grey" }}>Mobile number</Typography>
               <Typography>
-                {userData ? userData.phone : "Loading..."}
+                {vendorData ? vendorData.phone : "Loading..."}
               </Typography>
             </Box>
           </Box>
           <Box sx={{ margin: "2vh 0" }}>
-            <Box>
+            <Box sx={{display:"flex" , justifyContent:"space-between"}}>
               <Typography sx={{ color: "grey" }}>Email address</Typography>
               <Typography>
-                {userData ? userData.email : "Loading..."}
+                {vendorData ? vendorData.email : "Loading..."}
               </Typography>
             </Box>
-            <Button onClick={onLogout}>Logout</Button>
           </Box>
         </Box>
       </Box>
+}
     </>
   );
 }
