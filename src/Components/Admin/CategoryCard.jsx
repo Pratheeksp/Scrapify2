@@ -11,6 +11,11 @@ const CategoryCard = ({ category, onClick }) => {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
+              ":hover": {
+                backgroundColor: "lightgray",
+                boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
+                cursor: "pointer",
+              },
             }}
             onClick={() => onClick(id, subcategories)}
           >

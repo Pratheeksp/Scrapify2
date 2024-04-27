@@ -65,7 +65,7 @@ const Bill = () => {
   const handleAddItem = () => {
     const newItem = {
       subcat: "",
-      quantity: 1,
+      quantity: "",
       price: "",
       unit: "",
       tprice: "",
@@ -87,12 +87,13 @@ const Bill = () => {
             unit: selectedItem.unit, // Add the unit here
             tprice: 0,
           };
-        } else if (field === "quantity" && value !== "") {
-          const quantity = Number(value);
+        } else if (field === "quantity") {
+          const quantity = value !== "" ? Number(value) : ""; // Convert to number if not empty
           return {
             ...item,
             [field]: quantity,
-            tprice: item.subcat ? item.price * quantity : "",
+            tprice:
+              item.subcat && !isNaN(quantity) ? item.price * quantity : "", // Calculate tprice only if quantity is a number
           };
         }
       }

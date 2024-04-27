@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
 
-export default function ButtonAppBar({ nav1, nav2 }) {
+export default function ButtonAppBar({ nav1, nav2, nav3 }) {
   const navigate = useNavigate();
 
   const handleNav1 = () => {
@@ -37,6 +37,7 @@ export default function ButtonAppBar({ nav1, nav2 }) {
           <Button onClick={handleNav2} color="inherit">
             {nav2}
           </Button>
+          <Button>{nav3}</Button>
         </Toolbar>
       </AppBar>
     </Box>

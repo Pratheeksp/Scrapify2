@@ -109,7 +109,7 @@ const Dashboard = () => {
     fetchData();
   }, [page, rowsPerPage, orderBy, order]); // Fetch data when page, rowsPerPage, orderBy, or order changes
 
-  // Function to fetch balance
+  //  fetch balance
   useEffect( () => {
     const fetchBal = async () => {
       try {

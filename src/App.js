@@ -13,16 +13,20 @@ import VendorTable from "./Components/Admin/Vendor_Info/VendorTable";
 import VendorInfo from "./Components/Admin/Vendor_Info/VendorInfo";
 import PrevPickup from "./Components/Vendor/PrevPickup/PrevPickup";
 import Profile from "./Components/Vendor/VednorProfile/Profile"
+import Analytics from "./Components/Admin/Analytics/Analytics";
 function App() {
   return (
   
     <Routes>
       <Route path="/" element={<SignIn />} />
       <Route path="/signup" element={<SignUp />} />
-      <Route path="/admin" element={<Admin />} />
+      <Route path="/admin/item" element={<Admin />} />
       <Route path="/admin/dashboard" element={<Dashboard />} />
       <Route path="/admin/vendor_info" element={<VendorTable />} />
       <Route path="/admin/vendor_info/:id" element={<VendorInfo />} />
+      <Route path="/admin" element={<Analytics />} />
+
+
 
       <Route path="/vendor">
         <Route index element={<Vendor />} />

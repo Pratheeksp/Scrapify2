@@ -13,8 +13,8 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import styled from "@emotion/styled";
 import Map from "./Map";
 import ItemPhotos from "./ItemPhotos";
-import Modal from "./Modal";
-
+import Modal from "@mui/material/Modal";
+import BillModal from "./Modal";
 import { db } from "../../../config/firebase";
 import { collection, addDoc } from "firebase/firestore";
 
@@ -29,22 +29,37 @@ const ExpandMore = styled((props) => {
   }),
 }));
 
-const PickupBox = ({ pickupId, data, reserve }) => {
+const PickupBox = ({
+  pickupId,
+  data,
+  reserve,
+  reservationCount,
+  setReservationCount,
+}) => {
   const [expanded, setExpanded] = useState(false);
   const [expandedMap, setExpandedMap] = useState(false);
-  const [isOpen, setIsOpen] = useState(false); // Handling Modal
-  // const [reserve, setreserve] = useState(false);
-  console.log("Inside PickupBox", pickupId);
+  const [isOpen, setIsOpen] = useState(false); // Handling OTP Modal
+  const [showErrorModal, setShowErrorModal] = useState(false);
 
   const handleReserve = async () => {
+    if (parseInt(localStorage.getItem("reservationCount")) >= 1) {
+      setShowErrorModal(true);
+
+      setTimeout(() => {
+        setShowErrorModal(false); // Close the error modal after timeout
+      }, 4000);
+      return;
+    }
+
     try {
       const vendorId = localStorage.getItem("vid");
-      const pickupRef = collection(db, "reserve"); // Reference to the specific pickup document
+      const pickupRef = collection(db, "reserve");
       await addDoc(pickupRef, {
         pickupId,
-        reservedBy: vendorId, // Update the reserved field to true
+        reservedBy: vendorId,
       });
-      // setreserve(true);
+      setReservationCount(reservationCount + 1);
+      localStorage.setItem("reservationCount", "1");
     } catch (error) {
       console.error("Error reserving pickup:", error);
     }
@@ -58,15 +73,45 @@ const PickupBox = ({ pickupId, data, reserve }) => {
     setExpandedMap(!expandedMap);
   };
 
+  // Define the style object for the error modal
+  const style = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+
+    bgcolor: "background.paper",
+    border: "2px solid #000",
+    boxShadow: 24,
+    p: 4,
+  };
+
   return (
     <>
-      <Modal
+      <BillModal
         open={isOpen}
         onClose={() => setIsOpen(false)}
         pickupID={data.id}
         dbOtp={data.otp}
         email={data.email}
+
       />
+      <Modal
+        open={showErrorModal}
+        // sx={{ width: { md: "40%", xs: "40%" } }}
+        onClose={() => setShowErrorModal(false)}
+        aria-labelledby="error-modal-title"
+        aria-describedby="error-modal-description"
+      >
+        <Box sx={{ ...style }}>
+          <Typography variant="h6" component="h2">
+            Error
+          </Typography>
+          <Typography sx={{ mt: 2 }}>
+            You have already reserved 1 pickup. You cannot reserve more.
+          </Typography>
+        </Box>
+      </Modal>
       <Box
         sx={{
           marginTop: "5vh",
