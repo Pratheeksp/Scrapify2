@@ -20,7 +20,7 @@ import { v4 as uuidv4 } from "uuid";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { imgDB, db } from "../../../config/firebase";
 
-function Dialog1({ open1, handleClose, setProfileImg, setVendorData, setLoadingData }) {
+function Dialog1({ open1, handleClose, setVendorData, setLoadingData }) {
   const [imageSrc, setImageSrc] = useState(null);
 
   const handleFileChange = (event) => {
@@ -47,7 +47,7 @@ function Dialog1({ open1, handleClose, setProfileImg, setVendorData, setLoadingD
       await uploadBytes(storageRef, imageData);
       const downloadURL = await getDownloadURL(storageRef);
       console.log("Download URL:", downloadURL);
-      setProfileImg(downloadURL); // Update profile image URL in UI
+      // setProfileImg(downloadURL); // Update profile image URL in UI
   
       const vid = localStorage.getItem("vid");
       const vendorDocRef = doc(db, "vendor", vid);
@@ -131,7 +131,7 @@ function Dialog1({ open1, handleClose, setProfileImg, setVendorData, setLoadingD
 }
 
 function Profile() {
-  const [profileImg, setProfileImg] = useState(null);
+  // const [profileImg, setProfileImg] = useState(null);
   const [open1, setOpen1] = useState(false);
   const [vendorData, setVendorData] = useState(null);
   const [loadingData, setLoadingData] = useState(true);
@@ -152,7 +152,7 @@ function Profile() {
           if (vendorDoc.exists()) {
             const vendorData = vendorDoc.data();
             setVendorData(vendorData); // Set vendorData
-            setProfileImg(vendorData.profileImg);
+            // setProfileImg(vendorData.profileImg);
           } else {
             console.log("Vendor document does not exist");
           }
@@ -217,7 +217,7 @@ function Profile() {
         <Dialog1
           open1={open1}
           handleClose={handleClose}
-          setProfileImg={setProfileImg}
+          // setProfileImg={setProfileImg}
           setVendorData={setVendorData} 
           setLoadingData={setLoadingData} 
         />

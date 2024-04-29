@@ -9,7 +9,6 @@ import {
   Typography,
   useMediaQuery,
   Collapse,
-  Stack,
   Box,
   TextField,
 } from "@mui/material";
@@ -18,9 +17,6 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 
 import {
-  collection,
-  addDoc,
-  getDocs,
   getDoc,
   setDoc,
   doc,
@@ -34,13 +30,13 @@ const AddScrap = ({ id }) => {
   const [inputPrice, setInputPrice] = useState(0);
   const [inputUnit, setInputUnit] = useState("");
 
-  const dummydata = [
-    { subcat: "PET", subCatPrice: 2, unit: "kg" },
-    { subcat: "HDPE", subCatPrice: 3, unit: "kg" },
-    { subcat: "LDPE", subCatPrice: 4, unit: "kg" },
-    { subcat: "PP", subCatPrice: 5, unit: "kg" },
-    { subcat: "PVC", subCatPrice: 1, unit: "kg" },
-  ];
+  // const dummydata = [
+  //   { subcat: "PET", subCatPrice: 2, unit: "kg" },
+  //   { subcat: "HDPE", subCatPrice: 3, unit: "kg" },
+  //   { subcat: "LDPE", subCatPrice: 4, unit: "kg" },
+  //   { subcat: "PP", subCatPrice: 5, unit: "kg" },
+  //   { subcat: "PVC", subCatPrice: 1, unit: "kg" },
+  // ];
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -63,16 +59,16 @@ const AddScrap = ({ id }) => {
       const categoryDocSnap = await getDoc(categoryDocRef);
       const categoryData = categoryDocSnap.data();
 
-      // const newSubCategory = {
-      //   subcat: inputName,
-      //   subCatPrice: inputPrice,
-      //   unit: inputUnit,
-      // };
+      const newSubCategory = {
+        subcat: inputName,
+        subCatPrice: inputPrice,
+        unit: inputUnit,
+      };
 
       const updatedSubCategories = [
         ...categoryData.subcategories,
-        // newSubCategory,
-        ...dummydata,
+        newSubCategory,
+        // ...dummydata,
       ];
 
       await setDoc(categoryDocRef, {

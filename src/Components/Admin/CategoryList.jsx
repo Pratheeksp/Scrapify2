@@ -14,7 +14,7 @@ import React, { useState, useEffect } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import CategoryCard from "./CategoryCard";
 import { v4 as uuidv4 } from "uuid";
-import { collection, addDoc, setDoc, getDocs, doc } from "firebase/firestore";
+import { collection, setDoc, getDocs, doc } from "firebase/firestore";
 import { db } from "../../config/firebase";
 
 const CategoryList = ({ onClick }) => {
