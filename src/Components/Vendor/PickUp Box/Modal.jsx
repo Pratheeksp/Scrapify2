@@ -27,7 +27,14 @@ const overlayStyles = {
   zIndex: 1000,
 };
 
-const Modal = ({ open, onClose, pickupID, dbOtp,email }) => {
+const Modal = ({
+  open,
+  onClose,
+  pickupID,
+  dbOtp,
+  email,
+
+}) => {
   const [otp, setOtp] = useState("");
   const [isIncorrect, setIsIncorrect] = useState(false); // State for incorrect OTP
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down("sm"));
@@ -41,14 +48,15 @@ const Modal = ({ open, onClose, pickupID, dbOtp,email }) => {
 
   const onSubmitOTP = () => {
     try {
-  
-  
       // Convert both OTPs to strings for accurate comparison
       const dbOtpString = String(dbOtp);
       const enteredOtpString = String(otp);
-  
+
       if (dbOtpString === enteredOtpString) {
-        navigate("/vendor/bill", { state: { email :email,pickupId:pickupID} });
+
+        navigate("/vendor/bill", {
+          state: { email: email, pickupId: pickupID },
+        });
       } else {
         setIsIncorrect(true); // Set state to indicate incorrect OTP
       }
@@ -69,7 +77,7 @@ const Modal = ({ open, onClose, pickupID, dbOtp,email }) => {
         }}
       >
         <Typography sx={{ fontWeight: "bold" }}>
-          Pickup Id: {pickupID.substring(0,2)}
+          Pickup Id: {pickupID.substring(0, 2)}
         </Typography>
         <Typography sx={{ marginBottom: "2vh" }}> Enter The OTP </Typography>
 

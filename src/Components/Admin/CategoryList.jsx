@@ -14,7 +14,7 @@ import React, { useState, useEffect } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import CategoryCard from "./CategoryCard";
 import { v4 as uuidv4 } from "uuid";
-import { collection, addDoc,setDoc, getDocs,doc } from "firebase/firestore";
+import { collection, addDoc, setDoc, getDocs, doc } from "firebase/firestore";
 import { db } from "../../config/firebase";
 
 const CategoryList = ({ onClick }) => {
@@ -43,7 +43,7 @@ const CategoryList = ({ onClick }) => {
 
   const addCategoryToFirestore = async (newCategory) => {
     try {
-      const categoryCollectionRef = doc(db, "categories",newCategory.id);
+      const categoryCollectionRef = doc(db, "categories", newCategory.id);
       await setDoc(categoryCollectionRef, newCategory);
       console.log("Category added to Firestore");
     } catch (error) {
@@ -57,7 +57,7 @@ const CategoryList = ({ onClick }) => {
         id: uuidv4(),
         cat: input,
         subcategories: [],
-      
+        profit:Math.floor((Math.random()*20)),
       };
 
       setCategories((prevCategories) => [...prevCategories, newCategory]);
@@ -88,7 +88,16 @@ const CategoryList = ({ onClick }) => {
                 />
               </FormControl>
               <CardActions>
-                <IconButton onClick={onAddCategory}>
+                <IconButton
+                  onClick={onAddCategory}
+                  sx={{
+                    ":hover": {
+                      backgroundColor: "#5BBCFF",
+                      borderRadius: "50px",
+                      color: "white",
+                    },
+                  }}
+                >
                   <AddIcon />
                 </IconButton>
               </CardActions>

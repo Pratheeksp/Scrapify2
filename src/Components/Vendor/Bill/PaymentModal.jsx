@@ -2,8 +2,10 @@ import {
   Box,
   Button,
   Divider,
+  InputAdornment,
   Radio,
   RadioGroup,
+  Stack,
   TextField,
   Typography,
 } from "@mui/material";
@@ -11,7 +13,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { db } from "../../../config/firebase";
 import ReactDom from "react-dom";
-
+import EditIcon from "@mui/icons-material/Edit";
 import {
   collection,
   getDocs,
@@ -19,12 +21,16 @@ import {
   where,
   addDoc,
   Timestamp,
+  doc,
+  updateDoc,
+  deleteDoc,
+  setDoc,
 } from "firebase/firestore";
 import axios from "axios";
 
 const PaymentModal = ({ totalPrice, billItems, onClose }) => {
   const [paymentMethod, setPaymentMethod] = useState("UPI");
-  const [upiId, setUpiId] = useState("@okaysbi"); // Default UPI ID
+  const [upiId, setUpiId] = useState(""); // Default UPI ID
   const location = useLocation();
   const { email, pickupId } = location.state;
   const [customerInfo, setCustomerInfo] = useState({});
@@ -44,6 +50,7 @@ const PaymentModal = ({ totalPrice, billItems, onClose }) => {
           querySnapshot.forEach((doc) => {
             setCustomerInfo(doc.data());
             setUserId(doc.id);
+            setUpiId(doc.data().upi_id);
           });
         } else {
           console.log("No matching user found!");
@@ -97,10 +104,43 @@ const PaymentModal = ({ totalPrice, billItems, onClose }) => {
         status: paymentMethod === "UPI" ? "processing" : "processed",
       });
       console.log("Payment information stored successfully.");
+      const pickupDocRef = doc(db, "pickupDoc", pickupId);
+      await updateDoc(pickupDocRef, {
+        picked: true,
+      });
+
+      const reserveDocRef = collection(db, "reserve");
+      const querySnapshot = await getDocs(
+        query(collection(db, "reserve"), where("reservedBy", "==", vendorId))
+      );
+
+      // Iterate through the query snapshot to delete each matching document
+      querySnapshot.forEach(async (doc) => {
+        try {
+          // Delete the document
+          await deleteDoc(doc.ref);
+          console.log(`Document with ID ${doc.id} deleted successfully.`);
+        } catch (error) {
+          console.error(`Error deleting document with ID ${doc.id}:`, error);
+        }
+      });
+
       onClose(); // Close the modal after payment is processed
       navigate("/vendor");
     } catch (error) {
       console.error("Error processing payment:", error);
+    }
+  };
+
+  const handleSaveUpiId = async () => {
+    const uid = localStorage.getItem("uid");
+    try {
+      const userDocRef = doc(db, "users", uid);
+      await setDoc(userDocRef, { upi_id: upiId }, { merge: true });
+      // setOpeneEdit(false)
+      console.log("UPI ID saved successfully!");
+    } catch (err) {
+      console.error("Error saving UPI ID:", err);
     }
   };
 
@@ -111,52 +151,72 @@ const PaymentModal = ({ totalPrice, billItems, onClose }) => {
 
       {/* Modal content */}
       <Box style={modalContentStyle} sx={{ width: { md: "40%", xs: "80%" } }}>
-        <table style={{ width: "100%" }}>
-          <thead>
-            <tr>
-              <th style={{ textAlign: "center", padding: "10px" }}>Item</th>
-              <th style={{ textAlign: "center", padding: "10px" }}>Quantity</th>
-              <th style={{ textAlign: "center", padding: "10px" }}>Price</th>
-            </tr>
-          </thead>
-          <tbody>
-            {billItems.map((item, index) => (
-              <tr key={index}>
-                <td style={{ textAlign: "center", padding: "10px" }}>
-                  {item.subcat}
-                </td>
-                <td style={{ textAlign: "center", padding: "10px" }}>
-                  {item.quantity}
-                </td>
-                <td style={{ textAlign: "center", padding: "10px" }}>
-                  {item.tprice}
-                </td>
+        <Box
+          sx={{ maxHeight: { md: "300px", xs: "200px" }, overflowY: "auto" }}
+        >
+          <table style={{ width: "90%" }}>
+            <thead>
+              <tr>
+                <th style={{ textAlign: "center", padding: "10px" }}>Item</th>
+                <th style={{ textAlign: "center", padding: "10px" }}>
+                  Quantity
+                </th>
+                <th style={{ textAlign: "center", padding: "10px" }}>Price</th>
               </tr>
-            ))}
-            <tr
-              style={{
-                borderTop: "2px solid grey",
-                margin: "10px 0",
-                borderBottom: "2px solid grey",
-              }}
-            >
-              <td
-                colSpan="3"
+            </thead>
+            <tbody>
+              {billItems.map((item, index) => (
+                <tr key={index}>
+                  <td style={{ textAlign: "center", padding: "10px" }}>
+                    {item.subcat}
+                  </td>
+                  <td style={{ textAlign: "center", padding: "10px" }}>
+                    {item.quantity}
+                  </td>
+                  <td style={{ textAlign: "center", padding: "10px" }}>
+                    {item.tprice}
+                  </td>
+                </tr>
+              ))}
+              <tr
                 style={{
-                  textAlign: "center",
-                  padding: "10px",
-                  fontWeight: "bold",
-                  color: "grey",
+                  borderTop: "2px solid grey",
+                  margin: "10px 0",
+                  borderBottom: "2px solid grey",
                 }}
               >
-                Total: &#x20B9;{totalPrice.toFixed(2)}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                <td
+                  colSpan="3"
+                  style={{
+                    textAlign: "center",
+                    padding: "10px",
+                    fontWeight: "bold",
+                    color: "grey",
+                  }}
+                ></td>
+              </tr>
+            </tbody>
+          </table>
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            columnGap: "4px",
+            justifyContent: "center",
+            margin: "15px 0",
+          }}
+        >
+          <Typography sx={{ fontWeight: "bold", color: "grey" }}>
+            Total:
+          </Typography>
+          <Typography sx={{ fontWeight: "bold" }}>
+            {" "}
+            &#x20B9;{totalPrice.toFixed(2)}
+          </Typography>
+        </Box>
         <Divider style={{ margin: "20px 0" }} />
         <RadioGroup>
-          <Typography sx={{ marginBottom: "1.2rem" }}>
+          <Typography sx={{ marginBottom: "1.2rem" }} fontWeight={"bold"}>
             Payment Method :
           </Typography>
           <Box>
@@ -177,8 +237,20 @@ const PaymentModal = ({ totalPrice, billItems, onClose }) => {
                 />
               </Box>
               <TextField
-                label="Enter UPI ID"
-                value={upiId}
+                label="UPI ID"
+                value={upiId === undefined ? "Enter a UPI Id" : upiId}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Button
+                        onClick={handleSaveUpiId}
+                        disabled={paymentMethod === "UPI" ? false : true}
+                      >
+                        <EditIcon />
+                      </Button>
+                    </InputAdornment>
+                  ),
+                }}
                 onChange={(e) => setUpiId(e.target.value)}
                 disabled={paymentMethod !== "UPI"}
                 style={{ margin: "10px 0" }}

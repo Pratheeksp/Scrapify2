@@ -10,8 +10,8 @@ export default function ButtonAppBar({ nav1, nav2 }) {
   const navigate = useNavigate();
 
   const handleNav1 = () => {
-    if (nav1 === "dashboard") {
-      navigate("/admin/dashboard");
+    if (nav1 === "item") {
+      navigate("/admin/item");
     } else {
       navigate("/admin");
     }

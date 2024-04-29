@@ -6,7 +6,7 @@ import Navbar from "./Navbar";
 const Admin = () => {
   return (
     <Box>
- <Navbar nav1={"dashboard"} nav2={"vendors"}/>
+ <Navbar nav1={"home"} nav2={"vendors"}/>
 
       <Main />
     </Box>

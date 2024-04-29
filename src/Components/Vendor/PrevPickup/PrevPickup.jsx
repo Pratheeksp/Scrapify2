@@ -1,6 +1,8 @@
 import { Box, Divider, Typography } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../Navbar";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "../../../config/firebase";
 function PrevPickup() {
   const pickups = [
     {
@@ -31,12 +33,37 @@ function PrevPickup() {
       ],
     },
   ];
+  const [pickupData, setPickupData] = useState([]);
+
+  useEffect(() => {
+    const vendorId = localStorage.getItem("vid");
+
+    const fetchPickups = async () => {
+      try {
+        const paymentDocRef = collection(db, "payment");
+        const querySnapshot = await getDocs(
+          query(paymentDocRef, where("vendorId", "==", vendorId))
+        );
+
+        const pickupsData = [];
+        querySnapshot.forEach((doc) => {
+          pickupsData.push(doc.data());
+        });
+
+        setPickupData(pickupsData);
+      } catch (err) {
+        console.error("Error fetching pickups:", err);
+      }
+    };
+
+    fetchPickups();
+  }, []);
 
   return (
     <>
       <Navbar nav1={"Home"} nav2={"My Profile"} />
       <Box>
-        {pickups.length !== 0 ? (
+        {pickupData.length !== 0 ? (
           <>
             <Box
               sx={{
@@ -49,7 +76,7 @@ function PrevPickup() {
               <Typography fontWeight={"bolder"}>
                 Your Previous pickup's
               </Typography>
-              {pickups.map((pick) => (
+              {pickupData.map((pick) => (
                 <Box
                   sx={{
                     width: "70vw",
@@ -63,15 +90,21 @@ function PrevPickup() {
                 >
                   <Box
                     display={"flex"}
-                    justifyContent={"space-between"}
+                    flexDirection={{ xs: "column", md: "row" }}
+                    justifyContent={{ md: "space-between" }}
                     mb={"1vh"}
                   >
-                    <Typography color={"grey"}>{pick.date}</Typography>
-                    <Typography color={"grey"}>Id: {pick.orderId}</Typography>
+                    <Typography color={"grey"}>
+                      {pick.date?.toDate().toLocaleDateString()}
+                    </Typography>
+                    <Typography color={"grey"}>{pick.pickupId}</Typography>
                   </Box>
 
                   <Typography fontWeight={"bolder"} fontSize={"20px"}>
-                    Amount: &#8377;&nbsp;{pick.totalPrice}
+                    Amount: &#8377;&nbsp;{" "}
+                    <span style={{ color: "#58A399" }}>
+                      {pick.amount}
+                    </span>
                   </Typography>
                   <Divider sx={{ margin: "2vh 0" }} />
 
@@ -82,14 +115,14 @@ function PrevPickup() {
                       flexWrap: "wrap",
                     }}
                   >
-                    {pick.scrapsSold.map((scrap) => (
+                    {pick.material_info.map((scrap) => (
                       <li
                         style={{
                           padding: "0 1vw",
                           borderRight: "1px solid rgb(11, 225, 44)",
                         }}
                       >
-                        {scrap.item}
+                        {scrap.subcat}
                       </li>
                     ))}
                   </ul>

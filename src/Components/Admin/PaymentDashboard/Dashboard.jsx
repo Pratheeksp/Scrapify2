@@ -39,18 +39,18 @@ const BalanceText = styled(Typography)`
 
 const Dashboard = () => {
   const [details, setDetails] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [totalRows, setTotalRows] = useState(0);
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("");
-  const [balance, setBalance] = useState(null);
+  // const [balance, setBalance] = useState(null);
   const paymentDetails = [];
 
   const fetchData = async () => {
     try {
-      setLoading(true); // Display loader while fetching data
+      // setLoading(true); // Display loader while fetching data
   
       const paymentCollectionRef = collection(db, "payment");
       const unsubscribe = onSnapshot(paymentCollectionRef, (snapshot) => {
@@ -92,7 +92,7 @@ const Dashboard = () => {
           (page + 1) * rowsPerPage
         );
         setDetails(paginatedDetails);
-        setLoading(false); // Hide loader after data is fetched
+        // setLoading(false); // Hide loader after data is fetched
       });
   
       return () => {
@@ -109,18 +109,18 @@ const Dashboard = () => {
     fetchData();
   }, [page, rowsPerPage, orderBy, order]); // Fetch data when page, rowsPerPage, orderBy, or order changes
 
-  // Function to fetch balance
-  useEffect( () => {
-    const fetchBal = async () => {
-      try {
-        const balanceResponse = await axios.get("http://localhost:8080/getBalance");
-        setBalance(balanceResponse.data.items[0].balance / 100);
-      } catch (error) {
-        console.error("Error fetching balance:", error.message);
-      }
-    };
-    fetchBal();
-  },[paymentDetails])
+  //  fetch balance
+  // useEffect( () => {
+  //   const fetchBal = async () => {
+  //     try {
+  //       const balanceResponse = await axios.get("http://localhost:8080/getBalance");
+  //       setBalance(balanceResponse.data.items[0].balance / 100);
+  //     } catch (error) {
+  //       console.error("Error fetching balance:", error.message);
+  //     }
+  //   };
+  //   fetchBal();
+  // },[paymentDetails])
   
 
   const handleRequestSort = (property) => {
@@ -131,17 +131,17 @@ const Dashboard = () => {
 
   return (
     <>
-      <Navbar nav1={"Home"} nav2={"vendors"} />
+      {/* <Navbar nav1={"Home"} nav2={"vendors"} /> */}
       <Typography
-        align="center"
+
         variant="h3"
         sx={{
-          margin: "30px",
+          margin: "30px 0px",
           fontSize: { md: "28px", xs: "18px" },
           fontWeight: "bold",
         }}
       >
-        Payment Dashboard
+        Previous Payments
       </Typography>
       {loading ? (
         <Box sx={{ width: "100%" }}>
@@ -152,7 +152,7 @@ const Dashboard = () => {
           <StyledTableContainer
             component={Paper}
             sx={{
-              width: { md: "80%", xs: "100%" },
+              width: { md: "100%", xs: "100%" },
             }}
           >
             <StyledTable aria-label="simple table">
@@ -220,9 +220,9 @@ const Dashboard = () => {
               setPage(0);
             }}
           />
-          <BalanceWrapper>
+          {/* <BalanceWrapper>
             <BalanceText>Balance: {balance}</BalanceText>
-          </BalanceWrapper>
+          </BalanceWrapper> */}
         </>
       )}
     </>
