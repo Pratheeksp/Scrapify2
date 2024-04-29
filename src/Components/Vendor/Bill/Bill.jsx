@@ -4,31 +4,22 @@ import {
   Typography,
   Button,
   TextField,
-  Select,
-  MenuItem,
   Divider,
-  FormControl,
-  InputLabel,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  Stack,
   InputAdornment,
   Autocomplete,
 } from "@mui/material";
 import { Delete } from "@mui/icons-material";
-import { useLocation } from "react-router-dom";
+
 import PaymentModal from "./PaymentModal";
-import axios from "axios";
+
 
 import { db } from "../../../config/firebase";
 import {
   collection,
   getDocs,
   query,
-  where,
-  addDoc,
-  Timestamp,
+
+
 } from "firebase/firestore";
 
 const Bill = () => {

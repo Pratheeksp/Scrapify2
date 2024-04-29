@@ -5,7 +5,7 @@ import {
   InputAdornment,
   Radio,
   RadioGroup,
-  Stack,
+
   TextField,
   Typography,
 } from "@mui/material";
@@ -109,7 +109,7 @@ const PaymentModal = ({ totalPrice, billItems, onClose }) => {
         picked: true,
       });
 
-      const reserveDocRef = collection(db, "reserve");
+
       const querySnapshot = await getDocs(
         query(collection(db, "reserve"), where("reservedBy", "==", vendorId))
       );

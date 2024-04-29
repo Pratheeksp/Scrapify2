@@ -9,13 +9,13 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
-import Navbar from "../Navbar";
+
 import { Typography } from "@mui/material";
 import { db } from "../../../config/firebase";
 import { collection, onSnapshot } from "firebase/firestore";
 import TablePagination from "@mui/material/TablePagination";
 import TableSortLabel from "@mui/material/TableSortLabel";
-import axios from "axios";
+
 
 const StyledTableContainer = styled(TableContainer)`
   max-width: 100%;
@@ -26,27 +26,18 @@ const StyledTable = styled(Table)`
   min-width: 650px;
 `;
 
-const BalanceWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-`;
 
-const BalanceText = styled(Typography)`
-  font-size: 24px;
-  font-weight: bold;
-`;
 
 const Dashboard = () => {
   const [details, setDetails] = useState([]);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [totalRows, setTotalRows] = useState(0);
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("");
   // const [balance, setBalance] = useState(null);
-  const paymentDetails = [];
+
 
   const fetchData = async () => {
     try {
@@ -143,7 +134,7 @@ const Dashboard = () => {
       >
         Previous Payments
       </Typography>
-      {loading ? (
+      {false ? (
         <Box sx={{ width: "100%" }}>
           <LinearProgress />
         </Box>

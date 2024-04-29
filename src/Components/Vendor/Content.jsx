@@ -11,7 +11,7 @@ const Content = () => {
   const [pickupData, setPickupData] = useState([]); // Store the fetched pickup data
   const vendorId = localStorage.getItem("vid");
   const [reservation, setReservation] = useState([]);
-const [filteredReservation,setFilteredReservation] = useState([]);
+
   useEffect(() => {
     const pickupCollectionRef = collection(db, "pickupDoc");
     const reserveCollectionRef = collection(db, "reserve");
@@ -30,10 +30,6 @@ const [filteredReservation,setFilteredReservation] = useState([]);
           );
           setReservation(reservations);
 
-          // Count the number of reservations made by the vendor
-          const vendorReservations = reservations.filter(
-            (reservation) => reservation.reservedBy === vendorId
-          );
           
 
           const availablePickups = updatedPickups.filter((pickup) => {
