@@ -1,8 +1,8 @@
-import { Box, Grid } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 import { collection, getDocs } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { db } from "../../../config/firebase";
-import { PieChart } from "@mui/x-charts/PieChart";
+
 import { Chart } from "react-google-charts";
 // import { Pie } from 'react-chartjs-2';
 
@@ -12,7 +12,6 @@ import { Chart } from "react-google-charts";
 //chartdata={cat, subcat:{name, price, unit,tprice=0,tqty=0}....]}
 const Charts = () => {
   const [chartData, setChartData] = useState([]);
-
 
   useEffect(() => {
     const fetchchartdata = async () => {
@@ -54,7 +53,7 @@ const Charts = () => {
           subcategories: updatedSubcategories,
         };
       });
-      setChartData(updatedCategoriesData)
+      setChartData(updatedCategoriesData);
       console.log("final data", updatedCategoriesData);
     };
     fetchchartdata();
@@ -63,25 +62,24 @@ const Charts = () => {
   //fetch payment
   return (
     <>
-      <Grid container spacing={2} sx={{ marginTop: "3vh" }}>
+      <Grid
+        container
+        spacing={2}
+        sx={{ marginBottom: "5vh", marginTop: "3vh" }}
+      >
         <Grid item xs={12} sm={6}>
-          {
-            (chartData.length!==0) && (<Chart1 chartData={chartData}/>)
-          }
+          {chartData.length !== 0 && <Chart1 chartData={chartData} />}
         </Grid>
         <Grid item xs={12} sm={6}>
-        {
-            (chartData.length!==0) && (<Chart2 chartData={chartData}/>)
-          }
+          {chartData.length !== 0 && <Chart2 chartData={chartData} />}
         </Grid>
       </Grid>
     </>
   );
 };
 
-function Chart1({chartData}) {
-
-  console.log("Chart data received",chartData)
+function Chart1({ chartData }) {
+  console.log("Chart data received", chartData);
   const categoryData = chartData.map((category) => {
     const totalCategoryPrice = category.subcategories.reduce(
       (total, subcategory) => total + subcategory.totalPrice,
@@ -90,13 +88,16 @@ function Chart1({chartData}) {
     return [category.cat, totalCategoryPrice];
   });
 
-  const piechartdata=[["Category", "Total Price"], ...categoryData];
+  const piechartdata = [["Category", "Total Price"], ...categoryData];
   const options = {
     // title: "Total earnings",
     // legend:'none'
-    legend: {position: 'bottom', textStyle: {color: 'blue', fontSize: 16},alignment:'start'}
+    legend: {
+      position: "bottom",
+      textStyle: { color: "blue", fontSize: 16 },
+      alignment: "start",
+    },
     // pieHole:10
-
   };
   return (
     <Box
@@ -104,7 +105,7 @@ function Chart1({chartData}) {
         backgroundColor: "white",
         borderRadius: "10px",
         width: "100%",
-        height: "55vh", 
+        height: "65vh",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -116,56 +117,98 @@ function Chart1({chartData}) {
         options={options}
         width={"100%"}
         height={"100%"}
-       
       />
     </Box>
   );
 }
 
-function Chart2({chartData}) {
-  const linechartdata = chartData.map((category) => {
-    const data = category.subcategories.map((subcategory) => {
-      return [subcategory.subcat, subcategory.totalPrice];
-    });
-    return [{ type: "string", label: "Subcategory" }, ...data];
-  });
+function Chart2({ chartData }) {
+  const [visibleCategoryIndex, setVisibleCategoryIndex] = useState(0);
 
-  const options = {
-    title: "Total Price of Subcategories for Each Category",
-    legend: { position: "top", maxLines: chartData.length },
-    chartArea: { width: "50%" },
-    hAxis: { title: "Subcategory" },
-    vAxis: { title: "Total Price" },
-    series: {},
+  const handleLegendClick = (index) => {
+    setVisibleCategoryIndex(index);
   };
 
-  const seriesVisibility = chartData.reduce((obj, category, index) => {
-    obj[index] = { visibleInLegend: true };
-    return obj;
-  }, {});
+  // Prepare data for the selected category
+  const selectedCategory = chartData[visibleCategoryIndex];
+  const data = [
+    ["Subcategory", "Total Price"],
+    ...selectedCategory.subcategories.map((subcategory) => [
+      subcategory.subcat,
+      subcategory.totalPrice,
+    ]),
+  ];
 
-  options.series = seriesVisibility;
-
+  const totalCategoryPrice = selectedCategory.subcategories.reduce(
+    (total, subcategory) => total + subcategory.totalPrice,
+    0
+  );
+  // Prepare options for the chart
+  const options = {
+    // title: `${selectedCategory.cat} , Total earned : ${totalCategoryPrice} , Total profit : ${totalCategoryPrice * selectedCategory.profit *0.01}`,
+    legend: "none",
+    chartArea: { width: "70%" },
+    axisTitlesPosition: "in",
+    // hAxis: { title: "Subcategories" },
+    // vAxis: { title: "Total Price" },
+  };
   return (
     <Box
       sx={{
         backgroundColor: "white",
         borderRadius: "10px",
-        width: "100%", 
-        height: "55vh", 
+        width: "100%",
+        height: "65vh",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        flexDirection: "column",
       }}
     >
-       <Chart
-      chartType="LineChart"
-      data={linechartdata}
-      options={options}
-      width={"100%"}
-      height={"300px"}
-    />
+      <Typography sx={{ fontWeight: "bold", color: "blue" }}>
+        {selectedCategory.cat}
+      </Typography>
+      <Typography>
+        {/* <span style={{ fontWeight: "bold" ,color:'blue'}}>{selectedCategory.cat}</span> */}
+        <span style={{ color: "grey" }}> Total earned: </span>
+        <span style={{ fontWeight: "bold", color: "black" }}>
+          &#x20B9;&nbsp;{totalCategoryPrice}
+        </span>
+        <span style={{ color: "grey" }}> , Total profit: </span>
+        <span style={{ fontWeight: "bold", color: "black" }}>
+          &#x20B9;&nbsp;{totalCategoryPrice * selectedCategory.profit * 0.01}
+        </span>
+      </Typography>
 
+      <Chart
+        chartType="LineChart"
+        data={data}
+        options={options}
+        width={"100%"}
+        height={"90%"}
+      />
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          marginBottom: "5px",
+        }}
+      >
+        {chartData.map((category, index) => (
+          <div
+            key={index}
+            onClick={() => handleLegendClick(index)}
+            style={{
+              cursor: "pointer",
+              margin: "0 5px",
+              color: visibleCategoryIndex === index ? "blue" : "black",
+            }}
+          >
+            {category.cat}
+          </div>
+        ))}
+      </div>
     </Box>
   );
 }

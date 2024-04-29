@@ -90,17 +90,21 @@ function PrevPickup() {
                 >
                   <Box
                     display={"flex"}
-                    justifyContent={"space-between"}
+                    flexDirection={{ xs: "column", md: "row" }}
+                    justifyContent={{ md: "space-between" }}
                     mb={"1vh"}
                   >
                     <Typography color={"grey"}>
                       {pick.date?.toDate().toLocaleDateString()}
                     </Typography>
-                    <Typography color={"grey"}>Id: {pick.pickupId}</Typography>
+                    <Typography color={"grey"}>{pick.pickupId}</Typography>
                   </Box>
 
                   <Typography fontWeight={"bolder"} fontSize={"20px"}>
-                    Amount: &#8377;&nbsp;{pick.amount}
+                    Amount: &#8377;&nbsp;{" "}
+                    <span style={{ color: "#58A399" }}>
+                      {pick.amount}
+                    </span>
                   </Typography>
                   <Divider sx={{ margin: "2vh 0" }} />
 

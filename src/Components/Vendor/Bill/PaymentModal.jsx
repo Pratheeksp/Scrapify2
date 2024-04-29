@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   Divider,
+  InputAdornment,
   Radio,
   RadioGroup,
   Stack,
@@ -12,7 +13,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { db } from "../../../config/firebase";
 import ReactDom from "react-dom";
-
+import EditIcon from "@mui/icons-material/Edit";
 import {
   collection,
   getDocs,
@@ -22,12 +23,14 @@ import {
   Timestamp,
   doc,
   updateDoc,
+  deleteDoc,
+  setDoc,
 } from "firebase/firestore";
 import axios from "axios";
 
 const PaymentModal = ({ totalPrice, billItems, onClose }) => {
   const [paymentMethod, setPaymentMethod] = useState("UPI");
-  const [upiId, setUpiId] = useState("@okaysbi"); // Default UPI ID
+  const [upiId, setUpiId] = useState(""); // Default UPI ID
   const location = useLocation();
   const { email, pickupId } = location.state;
   const [customerInfo, setCustomerInfo] = useState({});
@@ -47,6 +50,7 @@ const PaymentModal = ({ totalPrice, billItems, onClose }) => {
           querySnapshot.forEach((doc) => {
             setCustomerInfo(doc.data());
             setUserId(doc.id);
+            setUpiId(doc.data().upi_id);
           });
         } else {
           console.log("No matching user found!");
@@ -105,10 +109,38 @@ const PaymentModal = ({ totalPrice, billItems, onClose }) => {
         picked: true,
       });
 
+      const reserveDocRef = collection(db, "reserve");
+      const querySnapshot = await getDocs(
+        query(collection(db, "reserve"), where("reservedBy", "==", vendorId))
+      );
+
+      // Iterate through the query snapshot to delete each matching document
+      querySnapshot.forEach(async (doc) => {
+        try {
+          // Delete the document
+          await deleteDoc(doc.ref);
+          console.log(`Document with ID ${doc.id} deleted successfully.`);
+        } catch (error) {
+          console.error(`Error deleting document with ID ${doc.id}:`, error);
+        }
+      });
+
       onClose(); // Close the modal after payment is processed
       navigate("/vendor");
     } catch (error) {
       console.error("Error processing payment:", error);
+    }
+  };
+
+  const handleSaveUpiId = async () => {
+    const uid = localStorage.getItem("uid");
+    try {
+      const userDocRef = doc(db, "users", uid);
+      await setDoc(userDocRef, { upi_id: upiId }, { merge: true });
+      // setOpeneEdit(false)
+      console.log("UPI ID saved successfully!");
+    } catch (err) {
+      console.error("Error saving UPI ID:", err);
     }
   };
 
@@ -119,7 +151,9 @@ const PaymentModal = ({ totalPrice, billItems, onClose }) => {
 
       {/* Modal content */}
       <Box style={modalContentStyle} sx={{ width: { md: "40%", xs: "80%" } }}>
-        <Box sx={{ maxHeight: {md:"300px",xs:"200px"}, overflowY: "auto" }}>
+        <Box
+          sx={{ maxHeight: { md: "300px", xs: "200px" }, overflowY: "auto" }}
+        >
           <table style={{ width: "90%" }}>
             <thead>
               <tr>
@@ -165,7 +199,12 @@ const PaymentModal = ({ totalPrice, billItems, onClose }) => {
           </table>
         </Box>
         <Box
-          sx={{ display: "flex", columnGap: "4px", justifyContent: "center",margin:"15px 0" }}
+          sx={{
+            display: "flex",
+            columnGap: "4px",
+            justifyContent: "center",
+            margin: "15px 0",
+          }}
         >
           <Typography sx={{ fontWeight: "bold", color: "grey" }}>
             Total:
@@ -177,7 +216,7 @@ const PaymentModal = ({ totalPrice, billItems, onClose }) => {
         </Box>
         <Divider style={{ margin: "20px 0" }} />
         <RadioGroup>
-          <Typography sx={{ marginBottom: "1.2rem" }}>
+          <Typography sx={{ marginBottom: "1.2rem" }} fontWeight={"bold"}>
             Payment Method :
           </Typography>
           <Box>
@@ -198,8 +237,20 @@ const PaymentModal = ({ totalPrice, billItems, onClose }) => {
                 />
               </Box>
               <TextField
-                label="Enter UPI ID"
-                value={upiId}
+                label="UPI ID"
+                value={upiId === undefined ? "Enter a UPI Id" : upiId}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Button
+                        onClick={handleSaveUpiId}
+                        disabled={paymentMethod === "UPI" ? false : true}
+                      >
+                        <EditIcon />
+                      </Button>
+                    </InputAdornment>
+                  ),
+                }}
                 onChange={(e) => setUpiId(e.target.value)}
                 disabled={paymentMethod !== "UPI"}
                 style={{ margin: "10px 0" }}

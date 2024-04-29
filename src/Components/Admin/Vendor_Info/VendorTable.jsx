@@ -18,35 +18,6 @@ import { collection } from "firebase/firestore";
 
 import { getDocs } from "firebase/firestore";
 
-export const vendors = [
-  {
-    id: 1,
-    name: "Vendor 1",
-    contactNumber: "1234567890",
-    email: "vendor1@example.com",
-    address: "123 Street, City",
-    locality: "Locality 1",
-    currentPickup: { pickupId: 1, amount: 100, customerName: "Customer A" },
-    pickupHistory: [
-      { pickupId: 1, amount: 100, customerName: "Customer A" },
-      { pickupId: 2, amount: 150, customerName: "Customer B" },
-    ],
-  },
-  {
-    id: 2,
-    name: "Vendor 2",
-    contactNumber: "0987654321",
-    email: "vendor2@example.com",
-    address: "456 Street, City",
-    locality: "Locality 2",
-    currentPickup: { pickupId: 3, amount: 200, customerName: "Customer C" },
-    pickupHistory: [
-      { pickupId: 3, amount: 200, customerName: "Customer C" },
-      { pickupId: 4, amount: 180, customerName: "Customer D" },
-    ],
-  },
-];
-
 const VendorList = () => {
   const [vendorDetails, setVendorDetails] = useState([]);
 
@@ -71,7 +42,7 @@ const VendorList = () => {
 
   return (
     <>
-      <Navbar nav1={"dashboard"} nav2={"home"} />
+      <Navbar nav1={"item"} nav2={"home"} />
       <Typography
         align="center"
         variant="h3"

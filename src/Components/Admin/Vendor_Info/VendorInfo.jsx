@@ -11,18 +11,18 @@ import {
   TableRow,
   Paper,
 } from "@mui/material";
-import { vendors } from "./VendorTable";
 import { Avatar } from "@mui/material";
 import Navbar from "../Navbar";
-import man from "./man.png";
-
 import { db } from "../../../config/firebase";
-import { collection, doc, getDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, where } from "firebase/firestore";
+import { query } from "firebase/database";
 
 const VendorInfo = () => {
-  // Access URL parameters
   const { id } = useParams();
-  const [vendor, setVendor] = useState([]);
+  const [vendor, setVendor] = useState({});
+  const [prevPickup, setPrevPickup] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchVendorData = async () => {
       try {
@@ -44,9 +44,37 @@ const VendorInfo = () => {
     }
   }, [id]);
 
+  useEffect(() => {
+    const fetchPrevPickup = async () => {
+      try {
+        const paymentDocRef = collection(db, "payment");
+        const querySnapshot = await getDocs(
+          query(paymentDocRef, where("vendorId", "==", id))
+        );
+
+        if (!querySnapshot.empty) {
+          const pickups = [];
+          querySnapshot.forEach((doc) => {
+            const pickupData = { id: doc.id, ...doc.data() };
+            pickups.push(pickupData);
+          });
+          setPrevPickup(pickups);
+        }
+      } catch (err) {
+        console.log("Error fetching previous Pickups", err);
+      } finally {
+        setLoading(false); // Update loading state regardless of success or failure
+      }
+    };
+
+    if (id) {
+      fetchPrevPickup();
+    }
+  }, [id]);
+
   return (
     <>
-      <Navbar nav1={"dashboard"} nav2={"home"} />
+      <Navbar nav1={"item"} nav2={"home"} />
       <Box
         sx={{
           margin: "20px",
@@ -82,16 +110,11 @@ const VendorInfo = () => {
             >
               Contact: {vendor.phone}
             </Typography>
-            {/* <Typography
-              sx={{ lineHeight: 2, fontSize: { md: "18px", xs: "13px" } }}
-            >
-              Address: {vendor.address}
-            </Typography> */}
           </Box>
           <Box sx={{ flexGrow: "3", display: "flex" }}>
             <Avatar
               alt="Remy Sharp"
-              src=""
+              src={vendor.profile}
               sx={{
                 width: { md: 140, xs: 80 },
                 height: { md: 140, xs: 80 },
@@ -107,31 +130,52 @@ const VendorInfo = () => {
         >
           Previous Pickups
         </Typography>
-       { null === null ?<Typography sx={{fontWeight:"bold",margin:"10px 30px"}}> No Previous Pickup </Typography>: <Box>
+        {loading ? (
+          <Typography sx={{ fontWeight: "bold", margin: "10px 30px" }}>
+            Loading...
+          </Typography>
+        ) : prevPickup.length === 0 ? (
+          <Typography sx={{ fontWeight: "bold", margin: "10px 30px" }}>
+            No Previous Pickup
+          </Typography>
+        ) : (
           <TableContainer
             component={Paper}
-            sx={{ margin: "20px", width: { md: "50%", xs: "90%" } }}
+            sx={{ margin: "20px", width: { md: "80%", xs: "90%" } }}
           >
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Pickup ID</TableCell>
+                  <TableCell>Date</TableCell>
+                  <TableCell>Order ID</TableCell>
+                  <TableCell>Payment ID</TableCell>
                   <TableCell>Amount</TableCell>
-                  <TableCell>Customer Name</TableCell>
+                  <TableCell>Payment Mode</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {/* {vendor.pickupHistory.map((pickup) => (
-                  <TableRow key={pickup.pickupId}>
+                {prevPickup.map((pickup) => (
+                  <TableRow key={pickup.id}>
+                    <TableCell>
+                      {new Date(pickup.date.toDate()).toLocaleString("en-US", {
+                        month: "short",
+                        day: "2-digit",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: true,
+                      })}
+                    </TableCell>
                     <TableCell>{pickup.pickupId}</TableCell>
+                    <TableCell>{pickup.id}</TableCell>
                     <TableCell>{pickup.amount}</TableCell>
-                    <TableCell>{pickup.customerName}</TableCell>
+                    <TableCell>{pickup.mode}</TableCell>
                   </TableRow>
-                ))} */}
+                ))}
               </TableBody>
             </Table>
           </TableContainer>
-        </Box> }
+        )}
       </Box>
     </>
   );

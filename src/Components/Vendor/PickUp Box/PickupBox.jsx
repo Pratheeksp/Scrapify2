@@ -8,6 +8,7 @@ import {
   Collapse,
   IconButton,
   Typography,
+  colors,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import styled from "@emotion/styled";
@@ -17,6 +18,7 @@ import Modal from "@mui/material/Modal";
 import BillModal from "./Modal";
 import { db } from "../../../config/firebase";
 import { collection, addDoc } from "firebase/firestore";
+import { BorderAllRounded } from "@mui/icons-material";
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -33,8 +35,7 @@ const PickupBox = ({
   pickupId,
   data,
   reserve,
-  reservationCount,
-  setReservationCount,
+  reservation
 }) => {
   const [expanded, setExpanded] = useState(false);
   const [expandedMap, setExpandedMap] = useState(false);
@@ -42,7 +43,7 @@ const PickupBox = ({
   const [showErrorModal, setShowErrorModal] = useState(false);
 
   const handleReserve = async () => {
-    if (parseInt(localStorage.getItem("reservationCount")) >= 1) {
+    if (reservation.length >= 1) {
       setShowErrorModal(true);
 
       setTimeout(() => {
@@ -51,6 +52,7 @@ const PickupBox = ({
       return;
     }
 
+
     try {
       const vendorId = localStorage.getItem("vid");
       const pickupRef = collection(db, "reserve");
@@ -58,8 +60,8 @@ const PickupBox = ({
         pickupId,
         reservedBy: vendorId,
       });
-      setReservationCount(reservationCount + 1);
-      localStorage.setItem("reservationCount", "1");
+
+
     } catch (error) {
       console.error("Error reserving pickup:", error);
     }
@@ -73,15 +75,16 @@ const PickupBox = ({
     setExpandedMap(!expandedMap);
   };
 
-  // Define the style object for the error modal
+  // style for the error modal
   const style = {
     position: "absolute",
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-
-    bgcolor: "background.paper",
+    borderRadius:"8px",
+    bgcolor: "background.paper",  
     border: "2px solid #000",
+
     boxShadow: 24,
     p: 4,
   };
@@ -103,7 +106,7 @@ const PickupBox = ({
         aria-labelledby="error-modal-title"
         aria-describedby="error-modal-description"
       >
-        <Box sx={{ ...style }}>
+        <Box sx={{ ...style,backgroundColor:"#272829",color:"white" }}>
           <Typography variant="h6" component="h2">
             Error
           </Typography>
@@ -115,7 +118,7 @@ const PickupBox = ({
       <Box
         sx={{
           marginTop: "5vh",
-          width: { md: "30vw", xs: "70vw" },
+          width: { md: "30vw", xs: "100vw" },
         }}
       >
         <Card
@@ -131,8 +134,8 @@ const PickupBox = ({
                 variant="body2"
                 color={reserve ? "primary.light" : "text.secondary"}
               >
-                Pickup ID: {pickupId}
-                Reserve :{reserve.toString()}
+                {pickupId}
+
               </Typography>
             </Box>
             <ExpandMore

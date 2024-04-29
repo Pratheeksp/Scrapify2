@@ -11,8 +11,7 @@ const Content = () => {
   const [pickupData, setPickupData] = useState([]); // Store the fetched pickup data
   const vendorId = localStorage.getItem("vid");
   const [reservation, setReservation] = useState([]);
-  const [reservationCount, setReservationCount] = useState(0);
-
+const [filteredReservation,setFilteredReservation] = useState([]);
   useEffect(() => {
     const pickupCollectionRef = collection(db, "pickupDoc");
     const reserveCollectionRef = collection(db, "reserve");
@@ -35,7 +34,7 @@ const Content = () => {
           const vendorReservations = reservations.filter(
             (reservation) => reservation.reservedBy === vendorId
           );
-          setReservationCount(vendorReservations.length);
+          
 
           const availablePickups = updatedPickups.filter((pickup) => {
             const isReservedByOtherVendor = reservations.some(
@@ -61,6 +60,7 @@ const Content = () => {
     (item) =>
       reservation.some((reser) => reser.pickupId === item.id) && !item.picked
   );
+
   const availablePickups = pickupData.filter(
     (item) =>
       !reservation.some((reserve) => reserve.pickupId === item.id) &&
@@ -68,7 +68,7 @@ const Content = () => {
       !item.picked
   );
 
-  console.log(reservationCount);
+  // console.log(reservationCount);
   return (
     <ThemeProvider theme={theme}>
       <Box
@@ -102,8 +102,7 @@ const Content = () => {
                 pickupId={item.id}
                 data={item}
                 reserve={true}
-                reservationCount={reservationCount}
-                setReservationCount={setReservationCount}
+                reservation={reservedPickups}
               />
             </Box>
           ))}
@@ -118,8 +117,7 @@ const Content = () => {
                 pickupId={item.id}
                 data={item}
                 reserve={false}
-                reservationCount={reservationCount}
-                setReservationCount={setReservationCount}
+                reservation={reservedPickups}
               />
             </Box>
           ))}

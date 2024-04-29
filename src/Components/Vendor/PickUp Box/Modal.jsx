@@ -53,7 +53,7 @@ const Modal = ({
       const enteredOtpString = String(otp);
 
       if (dbOtpString === enteredOtpString) {
-        localStorage.setItem("reservationCount", "0");
+
         navigate("/vendor/bill", {
           state: { email: email, pickupId: pickupID },
         });
