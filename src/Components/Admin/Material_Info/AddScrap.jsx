@@ -30,13 +30,7 @@ const AddScrap = ({ id }) => {
   const [inputPrice, setInputPrice] = useState(0);
   const [inputUnit, setInputUnit] = useState("");
 
-  // const dummydata = [
-  //   { subcat: "PET", subCatPrice: 2, unit: "kg" },
-  //   { subcat: "HDPE", subCatPrice: 3, unit: "kg" },
-  //   { subcat: "LDPE", subCatPrice: 4, unit: "kg" },
-  //   { subcat: "PP", subCatPrice: 5, unit: "kg" },
-  //   { subcat: "PVC", subCatPrice: 1, unit: "kg" },
-  // ];
+ 
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -68,7 +62,7 @@ const AddScrap = ({ id }) => {
       const updatedSubCategories = [
         ...categoryData.subcategories,
         newSubCategory,
-        // ...dummydata,
+
       ];
 
       await setDoc(categoryDocRef, {
