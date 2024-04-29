@@ -16,7 +16,6 @@ import { collection, onSnapshot } from "firebase/firestore";
 import TablePagination from "@mui/material/TablePagination";
 import TableSortLabel from "@mui/material/TableSortLabel";
 
-
 const StyledTableContainer = styled(TableContainer)`
   max-width: 100%;
   margin: 0 auto;
@@ -25,8 +24,6 @@ const StyledTableContainer = styled(TableContainer)`
 const StyledTable = styled(Table)`
   min-width: 650px;
 `;
-
-
 
 const Dashboard = () => {
   const [details, setDetails] = useState([]);
@@ -38,67 +35,63 @@ const Dashboard = () => {
   const [orderBy, setOrderBy] = useState("");
   // const [balance, setBalance] = useState(null);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // setLoading(true); // Display loader while fetching data
 
-  const fetchData = async () => {
-    try {
-      // setLoading(true); // Display loader while fetching data
-  
-      const paymentCollectionRef = collection(db, "payment");
-      const unsubscribe = onSnapshot(paymentCollectionRef, (snapshot) => {
-        const newPaymentDetails = []; // Create a new array to store the payment details
-  
-        snapshot.forEach((doc) => {
-          const paymentData = doc.data();
-          const id = doc.id;
-  
-          // Format createdAt timestamp
-          const createdAt = new Date(paymentData.date.toDate()).toLocaleString(
-            "en-US",
-            {
+        const paymentCollectionRef = collection(db, "payment");
+        const unsubscribe = onSnapshot(paymentCollectionRef, (snapshot) => {
+          const newPaymentDetails = []; // Create a new array to store the payment details
+
+          snapshot.forEach((doc) => {
+            const paymentData = doc.data();
+            const id = doc.id;
+
+            // Format createdAt timestamp
+            const createdAt = new Date(
+              paymentData.date.toDate()
+            ).toLocaleString("en-US", {
               month: "short",
               day: "2-digit",
               year: "numeric",
               hour: "2-digit",
               minute: "2-digit",
               hour12: true,
-            }
-          );
-  
-          newPaymentDetails.push({
-            id,
-            ...paymentData,
-            createdAt,
-          });
-        });
-  
-        // Sort the details by orderBy and order
-        const sortedDetails = stableSort(
-          newPaymentDetails,
-          getComparator(order, orderBy)
-        );
-  
-        setTotalRows(sortedDetails.length);
-        const paginatedDetails = sortedDetails.slice(
-          page * rowsPerPage,
-          (page + 1) * rowsPerPage
-        );
-        setDetails(paginatedDetails);
-        // setLoading(false); // Hide loader after data is fetched
-      });
-  
-      return () => {
-        // Unsubscribe from the real-time listener when component unmounts
-        unsubscribe();
-      };
-    } catch (error) {
-      console.error("Error fetching data:", error.message);
-    }
-  };
-  
+            });
 
-  useEffect(() => {
+            newPaymentDetails.push({
+              id,
+              ...paymentData,
+              createdAt,
+            });
+          });
+
+          // Sort the details by orderBy and order
+          const sortedDetails = stableSort(
+            newPaymentDetails,
+            getComparator(order, orderBy)
+          );
+
+          setTotalRows(sortedDetails.length);
+          const paginatedDetails = sortedDetails.slice(
+            page * rowsPerPage,
+            (page + 1) * rowsPerPage
+          );
+          setDetails(paginatedDetails);
+          // setLoading(false); // Hide loader after data is fetched
+        });
+
+        return () => {
+          // Unsubscribe from the real-time listener when component unmounts
+          unsubscribe();
+        };
+      } catch (error) {
+        console.error("Error fetching data:", error.message);
+      }
+    };
     fetchData();
-  }, [page, rowsPerPage, orderBy, order]); // Fetch data when page, rowsPerPage, orderBy, or order changes
+  }, [page, rowsPerPage, orderBy, order]);
 
   //  fetch balance
   // useEffect( () => {
@@ -112,7 +105,6 @@ const Dashboard = () => {
   //   };
   //   fetchBal();
   // },[paymentDetails])
-  
 
   const handleRequestSort = (property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -124,7 +116,6 @@ const Dashboard = () => {
     <>
       {/* <Navbar nav1={"Home"} nav2={"vendors"} /> */}
       <Typography
-
         variant="h3"
         sx={{
           margin: "30px 0px",
