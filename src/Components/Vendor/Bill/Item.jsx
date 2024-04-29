@@ -1,39 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import InputAdornment from "@mui/material/InputAdornment";
 import { Box } from "@mui/material";
 
 const Item = ({ amount }) => {
-  const categories = [
-    {
-      id: 1,
-      cat: "Ferrous",
-      subcategories: [
-        { subcat: "Steel", subCatPrice: 15.5 },
-        { subcat: "Iron", subCatPrice: 10.25 },
-        // Add more subcategories as needed
-      ],
-    },
-    {
-      id: 2,
-      cat: "Non-Ferrous",
-      subcategories: [
-        { subcat: "Aluminum", subCatPrice: 20.75 },
-        { subcat: "Copper", subCatPrice: 30.0 },
-      ],
-    },
-    {
-      id: 3,
-      cat: "E-Scrap",
-      subcategories: [
-        { subcat: "Circuit Boards", subCatPrice: 5.5 },
-        { subcat: "Hard Drives", subCatPrice: 8.75 },
-        // Add more subcategories as needed
-      ],
-    },
-    // Add more categories as needed
-  ];
+
 
   // Extract all subcategories as an array of strings
   const options = categories.reduce((acc, category) => {

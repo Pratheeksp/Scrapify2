@@ -6,7 +6,7 @@ import SignUp from "./Components/SingUp_In/SingUp";
 import { Route, Routes } from "react-router-dom";
 import SignIn from "./Components/SingUp_In/SingIn";
 import Bill2 from "./Components/Vendor/Bill/Bill";
-import Payment from "./Components/Vendor/Bill/Payment";
+
 //following has to be added
 import Dashboard from "./Components/Admin/PaymentDashboard/Dashboard";
 import VendorTable from "./Components/Admin/Vendor_Info/VendorTable";
@@ -35,7 +35,7 @@ function App() {
         <Route path="profile" element={<Profile />} />
       </Route>
 
-      <Route path="/payment" element={<Payment />} />
+
     </Routes>
   );
 }
