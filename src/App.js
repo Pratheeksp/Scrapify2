@@ -12,21 +12,21 @@ import Dashboard from "./Components/Admin/PaymentDashboard/Dashboard";
 import VendorTable from "./Components/Admin/Vendor_Info/VendorTable";
 import VendorInfo from "./Components/Admin/Vendor_Info/VendorInfo";
 import PrevPickup from "./Components/Vendor/PrevPickup/PrevPickup";
-import Profile from "./Components/Vendor/VednorProfile/Profile"
+import Profile from "./Components/Vendor/VednorProfile/Profile";
 import Analytics from "./Components/Admin/Analytics/Analytics";
 function App() {
   return (
-  
     <Routes>
       <Route path="/" element={<SignIn />} />
       <Route path="/signup" element={<SignUp />} />
-      <Route path="/admin/item" element={<Admin />} />
-      <Route path="/admin/dashboard" element={<Dashboard />} />
-      <Route path="/admin/vendor_info" element={<VendorTable />} />
-      <Route path="/admin/vendor_info/:id" element={<VendorInfo />} />
-      <Route path="/admin" element={<Analytics />} />
 
-
+      <Route path="/admin">
+        <Route index element={<Analytics />} />
+        <Route path="item" element={<Admin />} />
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="vendor_info" element={<VendorTable />} />
+        <Route path="vendor_info/:id" element={<VendorInfo />} />
+      </Route>
 
       <Route path="/vendor">
         <Route index element={<Vendor />} />
@@ -34,8 +34,6 @@ function App() {
         <Route path="pickup" element={<PrevPickup />} />
         <Route path="profile" element={<Profile />} />
       </Route>
-
-
     </Routes>
   );
 }
