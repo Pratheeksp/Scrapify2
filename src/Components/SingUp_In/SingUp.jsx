@@ -18,7 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { auth } from "../../config/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { db } from "../../config/firebase";
-import { doc,addDoc,setDoc,collection} from "firebase/firestore";
+import { doc,setDoc} from "firebase/firestore";
 
 
 const defaultTheme = createTheme();
@@ -49,7 +49,7 @@ export default function SignUp() {
           console.log('Successfully signed up:', user);
           console.log('Successfully signed up:', user.uid);
           
-          const usersCollectionRef = collection(db, 'admin');
+
     
           try {
             const userDocRef = doc(db, 'admin', user.uid);
@@ -89,7 +89,7 @@ export default function SignUp() {
           console.log('Successfully signed up:', user);
           console.log('Successfully signed up:', user.uid);
           
-          const usersCollectionRef = collection(db, 'vendor');
+
     
           try {
             const userDocRef = doc(db, 'vendor', user.uid);
