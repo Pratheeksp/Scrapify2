@@ -18,7 +18,7 @@ import { auth } from "../../config/firebase";
 
 const defaultTheme = createTheme();
 
-export default function SignIn({ setUserEmail }) {
+export default function SignIn() {
   const navigate = useNavigate();
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
