@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import React from "react";
 import NavBar from "../Navbar";
 import Charts from "./Charts";
@@ -18,6 +18,8 @@ const Analytics = () => {
   return (
     <Box>
       <NavBar nav1={"item"} nav2={"vendors"} />
+      <Typography>{localStorage.getItem('adminid')}</Typography>
+
       <Box sx={{padding:'5vh 2vw',background:'rgba(211, 211, 211, 0.4);',height:'100%'}}>
         <Topbox/>
         <Charts/>

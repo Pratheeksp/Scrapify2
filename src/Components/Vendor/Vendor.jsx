@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 import Content from "./Content";
 import Navbar from "./Navbar";
@@ -7,6 +7,7 @@ const Vendor = () => {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Navbar nav1={"My Pickups"} nav2={"My Profile"} />
+      <Typography>{localStorage.getItem('vid')}</Typography>
       <Box
         sx={{
           display: "flex",
