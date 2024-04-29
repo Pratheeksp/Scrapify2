@@ -4,35 +4,7 @@ import Navbar from "../Navbar";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../../config/firebase";
 function PrevPickup() {
-  const pickups = [
-    {
-      orderId: 1,
-      date: "2022-01-15",
-      totalPrice: 150,
-      scrapsSold: [
-        { item: "Paper", quantity: 10 },
-        { item: "Metal", quantity: 5 },
-      ],
-    },
-    {
-      orderId: 2,
-      date: "2022-02-01",
-      totalPrice: 200,
-      scrapsSold: [
-        { item: "Plastic", quantity: 15 },
-        { item: "Glass", quantity: 10 },
-      ],
-    },
-    {
-      orderId: 3,
-      date: "2022-03-10",
-      totalPrice: 180,
-      scrapsSold: [
-        { item: "Cardboard", quantity: 8 },
-        { item: "Aluminum", quantity: 10 },
-      ],
-    },
-  ];
+  
   const [pickupData, setPickupData] = useState([]);
 
   useEffect(() => {
