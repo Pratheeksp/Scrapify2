@@ -68,12 +68,12 @@ const PaymentModal = ({ totalPrice, billItems, onClose }) => {
     let payId = null;
     try {
       if (paymentMethod === "UPI") {
-        const response = await axios.post("http://localhost:8080/payment", {
+        const response = await axios.post("https://scrapify-pay.onrender.com/payment", {
           amount: totalPrice,
           from: "onboarding@resend.dev",
           to: email,
           subject: "Scrapify Invoice",
-          customerupi: "7829926870@paytm",
+          customerupi:"7829926870@paytm",
           customername: customerInfo.name,
           contact: customerInfo.phone,
           billItems,

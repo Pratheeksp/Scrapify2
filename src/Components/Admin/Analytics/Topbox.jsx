@@ -55,7 +55,7 @@ const Topbox = () => {
     const fetchBal = async () => {
       try {
         const balanceResponse = await axios.get(
-          "http://localhost:8080/getBalance"
+          "https://scrapify-pay.onrender.com/getBalance"
         );
         setBalance(balanceResponse.data.items[0].balance / 100);
         console.log("Balance:", balanceResponse.data.items[0].balance / 100);
