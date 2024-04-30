@@ -14,7 +14,7 @@ const Vendor = () => {
           justifyContent: "center",
           backgroundColor:"#F5EFE6",
 
-          height: "100vh", // Set the height to 100% of the viewport height for vertical centering
+          height: {md:"110vh",xs:"160vh"}, // Set the height to 100% of the viewport height for vertical centering
         }}
       >
         <Box>

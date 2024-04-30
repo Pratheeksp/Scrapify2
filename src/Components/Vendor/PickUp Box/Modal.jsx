@@ -74,6 +74,7 @@ const Modal = ({
           left: isMobile ? "50%" : modalStyles.left,
           transform: isMobile ? "translate(-50%, -50%)" : modalStyles.transform,
           maxWidth: 250,
+          width:{xs:"220px"}
         }}
       >
         <Typography sx={{ fontWeight: "bold" }}>
