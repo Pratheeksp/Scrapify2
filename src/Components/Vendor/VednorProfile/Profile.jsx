@@ -195,7 +195,7 @@ function Profile() {
           }}
         >
           <Avatar
-            sx={{ width: { xs: "150px", sm: "250px" }, height: "auto" }}
+            sx={{ width: { xs: "150px", sm: "250px" }, height: {md:"200px",xs:"140px",sm:"180px"} }}
             src={vendorData ? vendorData.profile : "Loading..."}
           ></Avatar>
           <Typography sx={{ m: "2vh 0", fontSize: { xs: "18px", sm: "24px" } }}>

@@ -5,13 +5,10 @@ import {
   Card,
   CardActions,
   CardContent,
-  Collapse,
   IconButton,
   Typography,
-
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import styled from "@emotion/styled";
 import Map from "./Map";
 import ItemPhotos from "./ItemPhotos";
 import Modal from "@mui/material/Modal";
@@ -19,28 +16,10 @@ import BillModal from "./Modal";
 import { db } from "../../../config/firebase";
 import { collection, addDoc } from "firebase/firestore";
 
-
-const ExpandMore = styled((props) => {
-  const { expand, ...other } = props;
-  return <IconButton {...other} />;
-})(({ theme, expand }) => ({
-  transform: !expand ? "rotate(0deg)" : "rotate(180deg)",
-  marginLeft: "auto",
-  transition: theme.transitions.create("transform", {
-    duration: theme.transitions.duration.shortest,
-  }),
-}));
-
-const PickupBox = ({
-  pickupId,
-  data,
-  reserve,
-  reservation
-}) => {
-  const [expanded, setExpanded] = useState(false);
-  const [expandedMap, setExpandedMap] = useState(false);
+const PickupBox = ({ pickupId, data, reserve, reservation }) => {
   const [isOpen, setIsOpen] = useState(false); // Handling OTP Modal
   const [showErrorModal, setShowErrorModal] = useState(false);
+  const [expandedMap, setExpandedMap] = useState(false); // State for map expansion
 
   const handleReserve = async () => {
     if (reservation.length >= 1) {
@@ -52,7 +31,6 @@ const PickupBox = ({
       return;
     }
 
-
     try {
       const vendorId = localStorage.getItem("vid");
       const pickupRef = collection(db, "reserve");
@@ -60,19 +38,9 @@ const PickupBox = ({
         pickupId,
         reservedBy: vendorId,
       });
-
-
     } catch (error) {
       console.error("Error reserving pickup:", error);
     }
-  };
-
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
-  };
-
-  const handleExpandClickMap = () => {
-    setExpandedMap(!expandedMap);
   };
 
   // style for the error modal
@@ -81,10 +49,9 @@ const PickupBox = ({
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    borderRadius:"8px",
-    bgcolor: "background.paper",  
+    borderRadius: "8px",
+    bgcolor: "background.paper",
     border: "2px solid #000",
-
     boxShadow: 24,
     p: 4,
   };
@@ -97,16 +64,14 @@ const PickupBox = ({
         pickupID={data.id}
         dbOtp={data.otp}
         email={data.email}
-
       />
       <Modal
         open={showErrorModal}
-        // sx={{ width: { md: "40%", xs: "40%" } }}
         onClose={() => setShowErrorModal(false)}
         aria-labelledby="error-modal-title"
         aria-describedby="error-modal-description"
       >
-        <Box sx={{ ...style,backgroundColor:"#272829",color:"white" }}>
+        <Box sx={{ ...style, backgroundColor: "#272829", color: "white" }}>
           <Typography variant="h6" component="h2">
             Error
           </Typography>
@@ -118,7 +83,7 @@ const PickupBox = ({
       <Box
         sx={{
           marginTop: "5vh",
-          width: { md: "30vw", xs: "100vw" },
+          width: { md: "30vw", xs: "90vw" },
         }}
       >
         <Card
@@ -128,84 +93,79 @@ const PickupBox = ({
               : "0px 4px 8px rgba(0, 0, 0, 0.2)",
           }}
         >
-          <CardActions disableSpacing>
-            <Box sx={{ height: { md: "3vh" } }}>
-              <Typography
-                variant="body2"
-                color={reserve ? "primary.light" : "text.secondary"}
-              >
-                {pickupId}
+          <CardContent>
+            <Typography
 
-              </Typography>
-            </Box>
-            <ExpandMore
-              expand={expanded}
-              onClick={handleExpandClick}
-              aria-expanded={expanded}
-              aria-label="show more"
+              color="text.secondary"
+              fontWeight={"bold"}
+              sx={{
+                bgcolor: reserve ? "lightblue" : "transparent",
+                width:"93%", // Change background color when reserved
+                display: "inline-block", // Ensure the background color only applies to the text area
+                py: 1, // Add padding for better visual appearance
+                px: 2, // Add padding for better visual appearance
+                borderRadius: "4px", // Add border radius for better visual appearance
+              }}
             >
-              <ExpandMoreIcon />
-            </ExpandMore>
-          </CardActions>
-
-          <Collapse
-            in={expanded}
-            timeout={{ enter: 400, exit: 200 }}
-            unmountOnExit
-          >
-            <CardContent>
-              <Box sx={{ height: expandedMap ? "70vh" : "40vh" }}>
-                <Card elevation={3}>
-                  <CardActions disableSpacing>
-                    <Typography variant="body2" color="text.secondary">
-                      {data.address.addressLine2}
-                    </Typography>
-                    <ExpandMore
-                      expand={expandedMap}
-                      onClick={handleExpandClickMap}
-                      aria-expanded={expandedMap}
-                      aria-label="show more"
-                    >
-                      <ExpandMoreIcon />
-                    </ExpandMore>
-                  </CardActions>
-                  <Collapse
-                    in={expandedMap}
-                    timeout={{ enter: 300, exit: 200 }}
-                    unmountOnExit
+              {pickupId}
+            </Typography>
+          </CardContent>
+          <CardContent>
+            <Box sx={{ height: expandedMap ? "70vh" : "40vh" }}>
+              <Card elevation={3}>
+                <CardActions disableSpacing>
+                  <IconButton
+                    aria-expanded={expandedMap}
+                    aria-label="show map"
+                    onClick={() => setExpandedMap(!expandedMap)}
                   >
-                    <CardContent>
-                      <Box sx={{ height: "30vh" }}>
-                        <Map
-                          location={{
-                            latitude: data.latitude,
-                            longitude: data.longitude,
-                          }}
-                        />
-                      </Box>
-                    </CardContent>
-                  </Collapse>
-                </Card>
-
-                <ItemPhotos photoLink={data.images} />
-                <Box>
-                  {!reserve && (
-                    <Button sx={{ margin: "2vh  0" }} onClick={handleReserve}>
-                      Reserve
-                    </Button>
-                  )}
-                  {reserve && (
-                    <Button
-                      sx={{ margin: "2vh  0" }}
-                      onClick={() => setIsOpen(true)}
-                    >
-                      Bill
-                    </Button>
-                  )}
-                </Box>
+                    <ExpandMoreIcon
+                      style={{ transform: expandedMap ? "rotate(180deg)" : "" }}
+                    />
+                  </IconButton>
+                  <Typography variant="body2" color="text.secondary">
+                    {data.address.addressLine2}
+                  </Typography>
+                </CardActions>
+                {expandedMap && (
+                  <CardContent>
+                    <Box sx={{ height: "30vh" }}>
+                    <Typography variant="body1" color="text.secondary" mb={2}>
+                       Address: {data.address.addressLine1}
+                      </Typography>
+                      <Map
+                        location={{
+                          latitude: data.latitude,
+                          longitude: data.longitude,
+                        }}
+                      />
+                    </Box>
+                  </CardContent>
+                )}
+              </Card>
+              <ItemPhotos photoLink={data.images} />
+              <Box>
+                {!reserve && (
+                  <Button
+                    sx={{ margin: "2vh 5%", width: "90%" }}
+                    variant="contained"
+                    onClick={handleReserve}
+                  >
+                    Reserve
+                  </Button>
+                )}
+                {reserve && (
+                  <Button
+                    sx={{ margin: "2vh 5%", width: "90%" }}
+                    variant="contained"
+                    onClick={() => setIsOpen(true)}
+                  >
+                    Bill
+                  </Button>
+                )}
               </Box>
-            </CardContent>
-          </Collapse>
+            </Box>
+          </CardContent>
         </Card>
       </Box>
     </>

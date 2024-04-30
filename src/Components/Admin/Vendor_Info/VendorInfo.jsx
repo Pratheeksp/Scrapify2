@@ -143,7 +143,7 @@ const VendorInfo = () => {
             component={Paper}
             sx={{ margin: "20px", width: { md: "80%", xs: "90%" } }}
           >
-            <Table>
+            <Table sx={{fontSize:{md:"14px",xs:"10px"}}}>
               <TableHead>
                 <TableRow>
                   <TableCell>Date</TableCell>
@@ -156,7 +156,7 @@ const VendorInfo = () => {
               <TableBody>
                 {prevPickup.map((pickup) => (
                   <TableRow key={pickup.id}>
-                    <TableCell>
+                    <TableCell sx={{textWrap:"nowrap"}}>
                       {new Date(pickup.date.toDate()).toLocaleString("en-US", {
                         month: "short",
                         day: "2-digit",

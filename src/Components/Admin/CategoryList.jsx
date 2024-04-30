@@ -1,15 +1,4 @@
-import {
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
-  FormControl,
-  FormLabel,
-  Grid,
-  IconButton,
-  Input,
-  Stack,
-} from "@mui/material";
+import { Box, Card, CardHeader, FormControl, FormLabel, IconButton, Input } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import CategoryCard from "./CategoryCard";
@@ -20,15 +9,16 @@ import { db } from "../../config/firebase";
 const CategoryList = ({ onClick }) => {
   const [categories, setCategories] = useState([]);
   const [input, setInput] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "categories"));
-        const loadedCategories = [];
-        querySnapshot.forEach((doc) => {
-          loadedCategories.push(doc.data());
-        });
+        const loadedCategories = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
         setCategories(loadedCategories);
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -57,7 +47,7 @@ const CategoryList = ({ onClick }) => {
         id: uuidv4(),
         cat: input,
         subcategories: [],
-        profit:Math.floor((Math.random()*20)),
+        profit: Math.floor(Math.random() * 20),
       };
 
       setCategories((prevCategories) => [...prevCategories, newCategory]);
@@ -68,45 +58,45 @@ const CategoryList = ({ onClick }) => {
 
   const onSelectCategory = (id, subCat) => {
     onClick(id, subCat);
+    setSelectedCategory(id); // Update selected category
   };
 
   return (
-    <Grid container sx={{ marginBottom: "3vh" }} spacing={4}>
-      <Grid item>
+    <Box sx={{ marginBottom: "3vh" }}>
+      <Box sx={{ marginBottom: "3vh" }}>
         <Card elevation={1}>
           <CardHeader title="Add Category" />
-
-          <CardContent>
-            <Stack direction="row" alignItems="bottom" spacing={2}>
-              <FormControl>
-                <FormLabel sx={{ fontWeight: "bold" }}>Material:</FormLabel>
-                <Input
-                  placeholder="Type in here…"
-                  variant="outlined"
-                  onChange={onMaterialInput}
-                  value={input}
-                />
-              </FormControl>
-              <CardActions>
-                <IconButton
-                  onClick={onAddCategory}
-                  sx={{
-                    ":hover": {
-                      backgroundColor: "#5BBCFF",
-                      borderRadius: "50px",
-                      color: "white",
-                    },
-                  }}
-                >
-                  <AddIcon />
-                </IconButton>
-              </CardActions>
-            </Stack>
-          </CardContent>
+          <Box sx={{ display: "flex", alignItems: "center", padding: "1rem" }}>
+            <FormControl>
+              <FormLabel sx={{ fontWeight: "bold" }}>Material:</FormLabel>
+              <Input
+                placeholder="Type in here…"
+                variant="outlined"
+                onChange={onMaterialInput}
+                value={input}
+              />
+            </FormControl>
+            <Box ml={2}>
+              <IconButton
+                onClick={onAddCategory}
+                sx={{
+                  ":hover": {
+                    backgroundColor: "#5BBCFF",
+                    borderRadius: "50px",
+                    color: "white",
+                  },
+                }}
+              >
+                <AddIcon />
+              </IconButton>
+            </Box>
+          </Box>
         </Card>
-      </Grid>
-      <CategoryCard category={categories} onClick={onSelectCategory} />
-    </Grid>
+      </Box>
+      <Box sx={{ display: "flex",flexWrap:"wrap" }}>
+        <CategoryCard category={categories} onClick={onSelectCategory} selectedCategory={selectedCategory} />
+      </Box>
+    </Box>
   );
 };
 
