@@ -66,8 +66,8 @@ const VendorList = () => {
         <Table sx={{ minWidth: "400px" }}>
           <TableHead>
             <TableRow>
-              <TableCell>VendorId</TableCell>
-              <TableCell>Vendor Name</TableCell>
+              <TableCell sx={{display:{xs:"none",md:"block"}}} >VendorId</TableCell>
+              <TableCell>Name</TableCell>
               <TableCell>Email</TableCell>
             </TableRow>
           </TableHead>
@@ -79,7 +79,7 @@ const VendorList = () => {
                 to={`/admin/vendor_info/${vendor.id}`}
                 style={{ textDecoration: "none" }}
               >
-                <TableCell>{vendor.id}</TableCell>
+                <TableCell sx={{display:{xs:"none",md:"block"}}}>{vendor.id}</TableCell>
                 <TableCell>{vendor.name}</TableCell>
                 <TableCell>{vendor.email}</TableCell>
               </TableRow>

@@ -1,44 +1,98 @@
-import * as React from "react";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import { useNavigate } from "react-router-dom";
+import * as React from 'react';
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import { useLocation, Link } from 'react-router-dom';
+import { Button } from '@mui/material';
 
-export default function ButtonAppBar({ nav1, nav2 }) {
-  const navigate = useNavigate();
+const pages = [
+  { name: 'Products', route: '/admin/item' },
+  { name: 'Vendors', route: '/admin/vendor_info' }
+];
+const settings = ['Logout'];
 
-  const handleNav1 = () => {
-    if (nav1 === "item") {
-      navigate("/admin/item");
-    } else {
-      navigate("/admin");
-    }
+function ResponsiveAppBar() {
+  const location = useLocation();
+  const [anchorElUser, setAnchorElUser] = React.useState(null);
+
+  const handleOpenUserMenu = (event) => {
+    setAnchorElUser(event.currentTarget);
   };
 
-  const handleNav2 = () => {
-    if (nav2 === "vendors") {
-      navigate("/admin/vendor_info");
-    } else {
-      navigate("/admin");
-    }
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
   };
+
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Scrapify
-          </Typography>
-          <Button onClick={handleNav1} color="inherit">
-            {nav1}
-          </Button>
-          <Button onClick={handleNav2} color="inherit">
-            {nav2}
-          </Button>
-        </Toolbar>
-      </AppBar>
-    </Box>
+    <AppBar position="static" sx={{ backgroundColor: "#2C4E80" }}>
+      <Toolbar>
+        <Typography variant="h6" noWrap sx={{ flexGrow: 1, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '.3rem', color: 'inherit', textDecoration: 'none' }}>
+          Scrapify
+        </Typography>
+
+        <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>
+          {pages.map((page) => (
+            <Button
+              key={page.name}
+              sx={{ mx: 2, color: location.pathname === page.route ? '#BACD92' : 'inherit' }}
+            >
+              <Link to={page.route} style={{ textDecoration: 'none', color: 'inherit' }}>
+                {page.name}
+              </Link>
+            </Button>
+          ))}
+          {settings.map((setting) => (
+            <Button key={setting} onClick={handleCloseUserMenu} sx={{ color: 'inherit' }}>
+              <Typography>{setting}</Typography>
+            </Button>
+          ))}
+        </Box>
+
+        <Box sx={{ display: { xs: 'flex', sm: 'none' } }}>
+          <IconButton
+            onClick={handleOpenUserMenu}
+            aria-label="menu"
+            color="inherit"
+          >
+            Menu
+          </IconButton>
+          <Menu
+            id="menu-appbar"
+            anchorEl={anchorElUser}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            getContentAnchorEl={null}
+            keepMounted
+            open={Boolean(anchorElUser)}
+            onClose={handleCloseUserMenu}
+          >
+            {pages.map((page) => (
+              <MenuItem key={page.name} onClick={handleCloseUserMenu} sx={{  color: location.pathname === page.route ? '#0D47A1' : 'inherit' }}>
+                <Link to={page.route} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <Typography textAlign="center">{page.name}</Typography>
+                </Link>
+              </MenuItem>
+            ))}
+            {settings.map((setting) => (
+              <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                <Typography textAlign="center">{setting}</Typography>
+              </MenuItem>
+            ))}
+          </Menu>
+        </Box>
+      </Toolbar>
+    </AppBar>
   );
 }
+
+export default ResponsiveAppBar;

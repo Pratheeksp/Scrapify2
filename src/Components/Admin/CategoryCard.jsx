@@ -1,31 +1,32 @@
-import { Card, CardContent, Typography, Grid } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 import React from "react";
 
-const CategoryCard = ({ category, onClick }) => {
+const CategoryCard = ({ category, onClick, selectedCategory }) => {
   return (
-    <>
+    <Grid container spacing={2} justifyContent="center" >
       {category.map(({ id, cat, subcategories }) => (
-        <Grid item key={id}>
-          <Card
+        <Grid item xs={6} sm={6} lg={4} key={id}>
+          <Box
             sx={{
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
+              backgroundColor: id === selectedCategory ? "lightgray" : "white",
+              boxShadow: "0 0 5px rgba(0, 0, 0, 0.1)",
+              borderRadius: "8px",
+              padding: "1rem",
               ":hover": {
                 backgroundColor: "lightgray",
-                boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
                 cursor: "pointer",
               },
             }}
             onClick={() => onClick(id, subcategories)}
           >
-            <CardContent>
-              <Typography>{cat}</Typography>
-            </CardContent>
-          </Card>
+            <Typography>{cat}</Typography>
+          </Box>
         </Grid>
       ))}
-    </>
+    </Grid>
   );
 };
 

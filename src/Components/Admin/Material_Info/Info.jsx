@@ -9,20 +9,20 @@ const Info = ({ id, subCat }) => {
 
   return (
     <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: {
-          xs: "center", 
-          md: "flex-start", 
-        },
-        alignItems: {
-          xs: "center", 
-          md: "flex-start", 
-        },
+      // sx={{
+      //   display: "flex",
+      //   flexDirection: "column",
+      //   justifyContent: {
+      //     xs: "center", 
+      //     md: "flex-start", 
+      //   },
+      //   alignItems: {
+      //     xs: "center", 
+      //     md: "flex-start", 
+      //   },
 
 
-      }}
+      // }}
     >
       <AddScrap id={id} />
       <Display id={id} subcat={subCat} />
