@@ -84,10 +84,13 @@ const PickupBox = ({ pickupId, data, reserve, reservation }) => {
         sx={{
           marginTop: "5vh",
           width: { md: "30vw", xs: "90vw" },
+
         }}
       >
         <Card
           sx={{
+          borderRadius:"15px",
+
             boxShadow: reserve
               ? "0px 4px 8px rgba(0, 0, 255, 0.2)"
               : "0px 4px 8px rgba(0, 0, 0, 0.2)",
@@ -112,7 +115,7 @@ const PickupBox = ({ pickupId, data, reserve, reservation }) => {
           </CardContent>
           <CardContent>
             <Box sx={{ height: expandedMap ? "70vh" : "40vh" }}>
-              <Card elevation={3}>
+              <Card elevation={3} >
                 <CardActions disableSpacing>
                   <IconButton
                     aria-expanded={expandedMap}
@@ -124,14 +127,20 @@ const PickupBox = ({ pickupId, data, reserve, reservation }) => {
                     />
                   </IconButton>
                   <Typography variant="body2" color="text.secondary">
-                    {data.address.addressLine2}
+                    Address
                   </Typography>
                 </CardActions>
                 {expandedMap && (
                   <CardContent>
                     <Box sx={{ height: "30vh" }}>
                     <Typography variant="body1" color="text.secondary" mb={2}>
-                       Address: {data.address.addressLine1}
+                        {data.address.addressLine1}
+                      </Typography>
+                      <Typography variant="body1" color="text.secondary" mb={2}>
+                        {data.address.addressLine2}
+                      </Typography>
+                      <Typography variant="body1" color="text.secondary" mb={2}>
+                        {data.address.pincode}
                       </Typography>
                       <Map
                         location={{
