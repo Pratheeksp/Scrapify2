@@ -11,12 +11,12 @@ const CategoryCard = ({ category, onClick, selectedCategory }) => {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              backgroundColor: id === selectedCategory ? "lightgray" : "white",
+              backgroundColor: id === selectedCategory ? "rgba(173, 216, 230, 0.3)" : "white",
               boxShadow: "0 0 5px rgba(0, 0, 0, 0.1)",
               borderRadius: "8px",
               padding: "1rem",
               ":hover": {
-                backgroundColor: "lightgray",
+                backgroundColor: "lightgrey",
                 cursor: "pointer",
               },
             }}
