@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { Button } from '@mui/material';
 
 const pages = [
@@ -18,6 +18,7 @@ const settings = ['Logout'];
 function ResponsiveAppBar() {
   const location = useLocation();
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const navigate = useNavigate();
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -25,6 +26,14 @@ function ResponsiveAppBar() {
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
+  };
+  const handleLogout = () => {
+
+    localStorage.removeItem('uid');
+    localStorage.removeItem('user_email');
+
+
+    navigate('/');
   };
 
   return (
@@ -46,7 +55,7 @@ function ResponsiveAppBar() {
             </Button>
           ))}
           {settings.map((setting) => (
-            <Button key={setting} onClick={handleCloseUserMenu} sx={{ color: 'inherit' }}>
+            <Button key={setting} onClick={handleLogout} sx={{ color: 'inherit' }}>
               <Typography>{setting}</Typography>
             </Button>
           ))}
@@ -84,7 +93,7 @@ function ResponsiveAppBar() {
               </MenuItem>
             ))}
             {settings.map((setting) => (
-              <MenuItem key={setting} onClick={handleCloseUserMenu}>
+              <MenuItem key={setting} onClick={handleLogout}>
                 <Typography textAlign="center">{setting}</Typography>
               </MenuItem>
             ))}

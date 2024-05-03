@@ -76,197 +76,24 @@ const AddScrap = ({ id }) => {
     }
   };
 
-  // return (
-  //   <>
-  //     <Card
-  //       variant="outlined"
-  //       sx={{
-  //         padding: 1,
-  //         overflow: "auto",
-  //         resize: "horizontal",
-  //         margin: "40px 0 ",
-  //         width: { xs: "250px", md: "600px" },
-  //       }}
-  //     >
-  //       <CardContent>
-  //         <Box
-  //           sx={{
-  //             display: "flex",
-  //             justifyContent: "center",
-  //             alignItems: "center",
-  //           }}
-  //         >
-  //           <Typography
-  //             sx={{
-  //               fontWeight: "bold",
-  //               marginLeft: "10px",
-  //               fontSize: isSmallScreen ? "16px" : "24px",
-  //             }}
-  //             level="title-lg"
-  //           >
-  //             Add New Scrap
-  //           </Typography>
-  //           {isSmallScreen ? (
-  //             <CardActions>
-  //               {expanded ? (
-  //                 <RemoveIcon
-  //                   onClick={handleExpandClick}
-  //                   aria-expanded={expanded}
-  //                   aria-label="hide details"
-  //                 />
-  //               ) : (
-  //                 <AddIcon
-  //                   onClick={handleExpandClick}
-  //                   aria-expanded={expanded}
-  //                   aria-label="show details"
-  //                 />
-  //               )}
-  //             </CardActions>
-  //           ) : null}
-  //         </Box>
-  //       </CardContent>
-
-  //       {isSmallScreen ? (
-  //         <Collapse in={expanded} timeout="auto" unmountOnExit>
-  //           <CardContent
-  //             sx={{
-  //               marginTop: "10px",
-  //               display: "flex",
-  //               flexDirection: "column",
-  //               gap: 1.5,
-  //               width: { md: "10%" }, // Width of expanded BOX for smaller screen
-  //             }}
-  //           >
-  //             <Box
-  //               sx={{
-  //                 display: "flex",
-  //                 columnGap: "30px",
-  //               }}
-  //             >
-  //               <FormControl>
-  //                 <FormLabel>Name</FormLabel>
-  //                 <Input
-  //                   sx={{
-  //                     fontSize: "14px",
-  //                     width: { md: "50%" },
-  //                     md: { flexGrow: 1 },
-  //                   }}
-  //                   onChange={onNameInput}
-  //                 />
-  //               </FormControl>
-  //               <FormControl>
-  //                 <FormLabel>Price</FormLabel>
-  //                 <Input
-  //                   sx={{
-  //                     fontSize: "14px",
-  //                     width: { xs: "90%" },
-
-  //                     md: { flexGrow: 1 },
-  //                   }}
-  //                   onChange={onPriceInput}
-  //                 />
-  //               </FormControl>
-  //             </Box>
-  //             <FormControl>
-  //               <FormLabel>Unit</FormLabel>
-  //               <Input
-  //                 sx={{
-  //                   fontSize: "14px",
-  //                   width: { xs: "90%", md: "90%" },
-  //                 }}
-  //                 onChange={onUnitInput}
-  //               />
-  //             </FormControl>
-  //             <CardActions>
-  //               <Button
-  //                 variant="solid"
-  //                 sx={{
-  //                   color: "#4793AF",
-  //                   ":hover": {
-  //                     color: "white",
-  //                     backgroundColor: "#4793AF",
-  //                   },
-  //                 }}
-  //                 onClick={onAddSubCat}
-  //               >
-  //                 Save
-  //               </Button>
-  //             </CardActions>
-  //           </CardContent>
-  //         </Collapse>
-  //       ) : (
-  //         <CardContent>
-  //           <Box
-  //             sx={{
-  //               marginTop: "10px",
-  //               display: "flex",
-  //               flexDirection: "column",
-  //               gap: 1.5,
-  //               // Width of the  expanded box for lager screen
-  //             }}
-  //           >
-  //             <Box
-  //               sx={{
-  //                 display: "flex",
-  //                 marginLeft: "10px",
-  //                 columnGap: "10px",
-  //                 width: "100%",
-  //               }}
-  //             >
-  //               <FormControl>
-  //                 <TextField
-  //                   sx={{ fontSize: "16px", flex: 1 }}
-  //                   onChange={onNameInput}
-  //                   label="Subcat"
-  //                 />
-  //               </FormControl>
-  //               <FormControl>
-  //                 <TextField
-  //                   sx={{ fontSize: "16px", flex: 1 }}
-  //                   onChange={onPriceInput}
-  //                   label="Price"
-  //                 />
-  //               </FormControl>
-  //             </Box>
-  //             <FormControl sx={{ marginLeft: "10px" }}>
-  //               <TextField
-  //                 sx={{ fontSize: "16px" }}
-  //                 onChange={onUnitInput}
-  //                 label="Unit"
-  //               />
-  //             </FormControl>
-  //             <CardActions>
-  //               <Button
-  //                 variant="solid"
-  //                 sx={{
-  //                   color: "#4793AF",
-  //                   ":hover": {
-  //                     color: "white",
-  //                     backgroundColor: "#4793AF",
-  //                   },
-  //                 }}
-  //                 onClick={onAddSubCat}
-  //               >
-  //                 Save
-  //               </Button>
-  //             </CardActions>
-  //           </Box>
-  //         </CardContent>
-  //       )}
-  //     </Card>
-  //   </>
-  // );
 
   return (
     <Box
-      sx={{ backgroundColor: "white", height: "25vh", borderRadius: "10px", display:'flex',flexDirection:'column'}}
+      sx={{ backgroundColor: "white", minHeight: "35vh", borderRadius: "10px", display:'flex',flexDirection:'column',backgroundColor:'rgba(173, 216, 230, 0.2)'}}
     >
       <Typography
         sx={{
           flex:1,
           fontWeight: "bold",
           textAlign:'center',
-          fontSize:'1.2rem'
+          fontSize:'1.2rem',
+          display:'flex',
+          alignItems:'center',
+          alignContent:'center',
+          width:'100%',
+          justifyContent:'center',
+          backgroundColor:'rgba(173, 216, 230, 0.8)',
+          borderRadius:"15px 15px  0 0"
         }}
         level="title-lg"
       
@@ -274,19 +101,16 @@ const AddScrap = ({ id }) => {
         Add New Scrap
       </Typography>
       <Box
-        sx={{
-          // height: "100%",
-          flex:1,
-          display: "flex",
-          alignContent: "center",
-          alignItems: "center",
-          justifyContent: "space-evenly",
-          flexWrap: "wrap",
-        }}
+        sx={{flex:1,display:'flex',justifyContent:'center', alignItems:'center',
+        alignContent:'center',}}
       >
-        <TextField label="Name" onChange={onNameInput} />
-        <TextField label="Price" onChange={onPriceInput} />
-        <FormControl>
+        <TextField label="Name" onChange={onNameInput} sx={{width:{xs:'90%',sm:'70%'},backgroundColor:'white'}}/>
+       </Box>
+
+       <Box sx={{display:'flex',padding:{xs:'0 5%',sm:'0 15%'}, alignItems:'center',
+          alignContent:'center',justifyContent:'space-between'}}>
+       <TextField label="Price" onChange={onPriceInput} sx={{width:'55%',backgroundColor:'white'}}/>
+        <FormControl sx={{width:'40%',backgroundColor:'white'}}>
         <InputLabel>Unit</InputLabel>
         <Select
           onChange={onUnitInput}
@@ -298,11 +122,15 @@ const AddScrap = ({ id }) => {
           <MenuItem value="/unit">/unit</MenuItem>
         </Select>
         </FormControl>
-        <Button onClick={onAddSubCat} variant="outlined">
+       </Box>
+
+        <Box sx={{flex:'1',padding:{xs:'0 5%',sm:'0 15%'}, display:'flex',alignItems:'center',
+          alignContent:'center',}}><Button sx={{width:'100%'}} onClick={onAddSubCat} variant="contained">
           Save
-        </Button>
+        </Button></Box>
+      
       </Box>
-    </Box>
+    
   );
 };
 

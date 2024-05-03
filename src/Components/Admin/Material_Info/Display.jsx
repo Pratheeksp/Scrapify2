@@ -83,8 +83,8 @@ const Display = ({ id, subcat }) => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell sx={{paddingRight:"50px"}}>
-                <Typography variant="h6" align="center">
+              <TableCell>
+                <Typography variant="h6" align="center" >
                   Name
                 </Typography>
               </TableCell>
@@ -95,17 +95,17 @@ const Display = ({ id, subcat }) => {
               </TableCell>
             </TableRow>
           </TableHead>
-          <TableBody>
+          <TableBody >
             {subcat.map(({ subcat: name, subCatPrice, unit }, index) => (
               <TableRow key={name} >
-                <TableCell sx={{paddingRight:"30px"}}>{name}</TableCell>
-                <TableCell  sx={{paddingLeft:"30px"}}>
+                <TableCell  align="center" width={"40%"} >{name}</TableCell>
+                <TableCell align="center" width={"60%"}>
                   <FormControl>
                     <TextField
-                      sx={{ maxWidth: { md: "150px", xs: "130px" } }}
-                      value={editedIndex === index ? editedPrice : subCatPrice}
+                   
+                      value={editedIndex === index ? editedPrice : subCatPrice+" /"+unit}
                       variant="outlined"
-                      label={unit}
+                      // label={unit}
                       inputProps={{ style: { fontSize: "14px" } }}
                       InputProps={{
                         startAdornment: (
@@ -119,13 +119,13 @@ const Display = ({ id, subcat }) => {
                                   onClick={() => onSavePrice(index)}
                                   size="small"
                                 >
-                                  <CheckIcon fontSize="small" />
+                                  <CheckIcon fontSize="small" sx={{color:'green'}}/>
                                 </IconButton>
                                 <IconButton
                                   onClick={() => handleCancelEdit(index)}
                                   size="small"
                                 >
-                                  <CloseIcon fontSize="small" />
+                                  <CloseIcon fontSize="small" sx={{color:"red"}}/>
                                 </IconButton>
                               </>
                             ) : (
@@ -135,7 +135,7 @@ const Display = ({ id, subcat }) => {
                                 }
                                 size="small"
                               >
-                                <EditIcon fontSize="small" />
+                                <EditIcon fontSize="small" sx={{color:"#1c4be6;"}}/>
                               </IconButton>
                             )}
                           </InputAdornment>

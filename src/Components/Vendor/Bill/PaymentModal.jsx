@@ -5,7 +5,6 @@ import {
   InputAdornment,
   Radio,
   RadioGroup,
-
   TextField,
   Typography,
 } from "@mui/material";
@@ -35,10 +34,11 @@ const PaymentModal = ({ totalPrice, billItems, onClose }) => {
   const { email, pickupId } = location.state;
   const [customerInfo, setCustomerInfo] = useState({});
   const [userId, setUserId] = useState(null);
-
+ const [loading,setLoading] = useState(false)
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log("called me");
     const fetchCustomerId = async () => {
       try {
         const usersCollectionRef = collection(db, "users");
@@ -61,29 +61,35 @@ const PaymentModal = ({ totalPrice, billItems, onClose }) => {
     };
 
     fetchCustomerId();
-  }, [email]);
+  }, []);
 
   const handlePayment = async () => {
     // Add logic based on payment method (cash or UPI)
     let payId = null;
     try {
+      console.log("handlePayment function called");
+      setLoading(true);
       if (paymentMethod === "UPI") {
-        const response = await axios.post("https://scrapify-pay.onrender.com/payment", {
-          amount: totalPrice,
-          from: "onboarding@resend.dev",
-          to: email,
-          subject: "Scrapify Invoice",
-          customerupi:"7829926870@paytm",
-          customername: customerInfo.name,
-          contact: customerInfo.phone,
-          billItems,
-          pickupid: pickupId,
-        });
+        const response = await axios.post(
+          "https://scrapify-pay.onrender.com/payment",
+          {
+            amount: totalPrice,
+            from: "onboarding@resend.dev",
+            to: email,
+            subject: "Scrapify Invoice",
+            customerupi: "7829926870@paytm",
+            customername: customerInfo.name,
+            contact: customerInfo.phone,
+            billItems,
+            pickupid: pickupId,
+          }
+        );
         console.log("response", response.data);
         payId = response.data.payId;
         console.log(payId);
       }
-
+      onClose(); // Close the modal after payment is processed
+      navigate("/vendor");
       // Update database with payment information
       const vendorId = localStorage.getItem("vid");
 
@@ -109,7 +115,6 @@ const PaymentModal = ({ totalPrice, billItems, onClose }) => {
         picked: true,
       });
 
-
       const querySnapshot = await getDocs(
         query(collection(db, "reserve"), where("reservedBy", "==", vendorId))
       );
@@ -125,19 +130,24 @@ const PaymentModal = ({ totalPrice, billItems, onClose }) => {
         }
       });
 
-      onClose(); // Close the modal after payment is processed
-      navigate("/vendor");
+     
     } catch (error) {
       console.error("Error processing payment:", error);
     }
   };
 
   const handleSaveUpiId = async () => {
-    const uid = localStorage.getItem("uid");
+
+
     try {
-      const userDocRef = doc(db, "users", uid);
+
+
+
+      const userDocRef = doc(db, "users", userId);
+
+
       await setDoc(userDocRef, { upi_id: upiId }, { merge: true });
-      // setOpeneEdit(false)
+
       console.log("UPI ID saved successfully!");
     } catch (err) {
       console.error("Error saving UPI ID:", err);
@@ -236,14 +246,16 @@ const PaymentModal = ({ totalPrice, billItems, onClose }) => {
                   sx={{ justifyContent: "center" }}
                 />
               </Box>
+
               <TextField
                 label="UPI ID"
-                value={upiId === undefined ? "Enter a UPI Id" : upiId}
+                placeholder="Enter Upi Id"
+                value={upiId === undefined ? "" : upiId}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
                       <Button
-                        onClick={handleSaveUpiId}
+                        onClick={() => handleSaveUpiId()}
                         disabled={paymentMethod === "UPI" ? false : true}
                       >
                         <EditIcon />
@@ -275,6 +287,7 @@ const PaymentModal = ({ totalPrice, billItems, onClose }) => {
           }}
         >
           <Button
+          disabled={loading}
             onClick={handlePayment}
             sx={{
               backgroundColor: "#65B741",
@@ -321,6 +334,7 @@ const modalBackdropStyle = {
   zIndex: 9999, // Ensure it appears above everything
 };
 
+
 const modalContentStyle = {
   position: "fixed",
   top: "50%",
@@ -330,6 +344,6 @@ const modalContentStyle = {
   backgroundColor: "white",
   padding: "20px",
   borderRadius: "8px",
-  boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)", // Box shadow for depth
+  boxShadow: "0 0 10px rgba(0, 0, 0, 0.9)", // Box shadow for depth
   zIndex: 10000, // Ensure it appears above backdrop
 };
