@@ -13,8 +13,8 @@ const Vendor = () => {
           display: "flex",
           justifyContent: "center",
           backgroundColor:"#F5EFE6",
-
-          height: {md:"110vh",xs:"160vh"}, // Set the height to 100% of the viewport height for vertical centering
+          paddingBottom:"100px",
+          height: "100%" // Set the height to 100% of the viewport height for vertical centering
         }}
       >
         <Box>
