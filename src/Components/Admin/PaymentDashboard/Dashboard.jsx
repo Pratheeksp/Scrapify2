@@ -12,7 +12,7 @@ import LinearProgress from "@mui/material/LinearProgress";
 
 import { Typography } from "@mui/material";
 import { db } from "../../../config/firebase";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot, query ,orderBy as orderByFirestore} from "firebase/firestore";
 import TablePagination from "@mui/material/TablePagination";
 import TableSortLabel from "@mui/material/TableSortLabel";
 
@@ -41,7 +41,7 @@ const Dashboard = () => {
         // setLoading(true); // Display loader while fetching data
 
         const paymentCollectionRef = collection(db, "payment");
-        const unsubscribe = onSnapshot(paymentCollectionRef, (snapshot) => {
+        const unsubscribe = onSnapshot( query(paymentCollectionRef, orderByFirestore("date", "desc")), (snapshot) => {
           const newPaymentDetails = []; // Create a new array to store the payment details
 
           snapshot.forEach((doc) => {

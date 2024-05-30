@@ -11,6 +11,7 @@ import { Button } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import MenuIcon from "@mui/icons-material/Menu";
 import LogoutIcon from "@mui/icons-material/Logout";
+import Navbar_sm from "./Navbar_sm";
 
 const pages = [
   { name: "My Pickups", route: "/vendor/pickup" },
@@ -22,6 +23,9 @@ const settings = ["Home", "Logout"];
 function ResponsiveAppBar() {
   const location = useLocation();
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [open, setOpen] = React.useState();
+
+
   const navigate = useNavigate();
 
   const handleOpenUserMenu = (event) => {
@@ -100,13 +104,101 @@ function ResponsiveAppBar() {
 
         <Box sx={{ display: { xs: "flex", sm: "none" } }}>
           <IconButton
-            onClick={handleOpenUserMenu}
+            // onClick={handleOpenUserMenu}
+            onClick={() => setOpen(!open)}
+
             aria-label="menu"
             color="inherit"
           >
-            <MenuIcon />
+            {/* <MenuIcon /> */}
+            <Box
+                sx={{ display: "flex", flexDirection: "column", rowGap: "5px" }}
+              >
+                <Box
+                  sx={{
+                    height: "3px",
+                    width: "28px",
+                    backgroundColor: "white",
+                    borderRadius: "4px",
+                    animation: open
+                      ? "btn1-fr 0.3s ease-in-out forwards"
+                      : "btn1-rev 0.3s ease-in-out forwards",
+                    "@keyframes btn1-fr": {
+                      from: {
+                        transform: "rotate(0deg) translate(0px, 0px)",
+                      },
+                      to: {
+                        transform: "rotate(45deg) translate(4px, 8px)",
+                      },
+                    },
+                    "@keyframes btn1-rev": {
+                      from: {
+                        transform: "rotate(45deg) translate(4px, 8px)",
+                      },
+                      to: {
+                        transform: "rotate(0deg) translate(0px, 0px)",
+                      },
+                    },
+                  }}
+                ></Box>
+                <Box
+                  sx={{
+                    height: "3px",
+                    width: "28px",
+                    backgroundColor: "white",
+                    borderRadius: "4px",
+                    // visibility: "hidden",
+                    animation: open ? "btn2-fr 0.4s ease-in forwards" : "btn2-rev 0.3s ease-in forwards",
+                    "@keyframes btn2-fr": {
+                      "0%": {
+                        transform: "rotate(0deg) translate(0px, 0px)",
+                      },
+                      "100% ": {
+                        width: "0px",
+                        transform: " translate(10px, 0px)",
+                      },
+                    },
+                    "@keyframes btn2-rev": {
+                      "0%": {
+                        width: "0px",
+                        transform: " translate(10px, 0px)",
+                      },
+                      "100% ": {
+                        transform: "rotate(0deg) translate(0px, 0px)",
+                      },
+                    },
+                  }}
+                ></Box>
+                <Box
+                  sx={{
+                    height: "3px",
+                    width: "28px",
+                    backgroundColor: "white",
+                    borderRadius: "4px",
+                    animation: open
+                      ? "btn3-fr 0.3s ease-in-out forwards"
+                      : "btn3-rev 0.3s ease-in-out forwards",
+                    "@keyframes btn3-fr": {
+                      from: {
+                        transform: "rotate(0deg) translate(0px, 0px)",
+                      },
+                      to: {
+                        transform: "rotate(-45deg) translate(3px, -8px)",
+                      },
+                    },
+                    "@keyframes btn3-rev": {
+                      from: {
+                        transform: "rotate(-45deg) translate(3px, -8px)",
+                      },
+                      to: {
+                        transform: "rotate(0deg) translate(0px, 0px)",
+                      },
+                    },
+                  }}
+                ></Box>
+              </Box>
           </IconButton>
-          <Menu
+          {/* <Menu
             id="menu-appbar"
             anchorEl={anchorElUser}
             anchorOrigin={{
@@ -153,7 +245,8 @@ function ResponsiveAppBar() {
                 <Typography textAlign="center">{setting}</Typography>
               </MenuItem>
             ))}
-          </Menu>
+          </Menu> */}
+          {open && <Navbar_sm />}
         </Box>
       </Toolbar>
     </AppBar>

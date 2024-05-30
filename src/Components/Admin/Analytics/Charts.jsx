@@ -176,7 +176,7 @@ function Chart2({ chartData }) {
         </span>
         <span style={{ color: "grey" }}> , Total profit: </span>
         <span style={{ fontWeight: "bold", color: "black" }}>
-          &#x20B9;&nbsp;{totalCategoryPrice * selectedCategory.profit * 0.01}
+          &#x20B9;&nbsp;{(totalCategoryPrice * selectedCategory.profit * 0.01).toFixed(2)}
         </span>
       </Typography>
 

@@ -84,12 +84,11 @@ const PickupBox = ({ pickupId, data, reserve, reservation }) => {
         sx={{
           marginTop: "5vh",
           width: { md: "30vw", xs: "90vw" },
-
         }}
       >
         <Card
           sx={{
-          borderRadius:"15px",
+            borderRadius: "15px",
 
             boxShadow: reserve
               ? "0px 4px 8px rgba(0, 0, 255, 0.2)"
@@ -98,12 +97,11 @@ const PickupBox = ({ pickupId, data, reserve, reservation }) => {
         >
           <CardContent>
             <Typography
-
               color="text.secondary"
               fontWeight={"bold"}
               sx={{
                 bgcolor: reserve ? "lightblue" : "transparent",
-                width:"93%", // Change background color when reserved
+                width: "93%", // Change background color when reserved
                 display: "inline-block", // Ensure the background color only applies to the text area
                 py: 1, // Add padding for better visual appearance
                 px: 2, // Add padding for better visual appearance
@@ -114,8 +112,8 @@ const PickupBox = ({ pickupId, data, reserve, reservation }) => {
             </Typography>
           </CardContent>
           <CardContent>
-            <Box sx={{ height: expandedMap ? "70vh" : "40vh" }}>
-              <Card elevation={3} >
+            <Box sx={{ height: expandedMap ? "58vh" : "40vh" }}>
+              <Card elevation={3}>
                 <CardActions disableSpacing>
                   <IconButton
                     aria-expanded={expandedMap}
@@ -131,15 +129,30 @@ const PickupBox = ({ pickupId, data, reserve, reservation }) => {
                   </Typography>
                 </CardActions>
                 {expandedMap && (
-                  <CardContent>
-                    <Box sx={{ height: "30vh" }}>
-                    <Typography variant="body1" color="text.secondary" mb={2}>
+                  <CardContent sx={{ height: "38vh" }}>
+                    <Box sx={{ height: "68%", width: "100%" }}>
+                      <Typography
+                        sx={{ fontSize: "12px" }}
+                        variant="body1"
+                        color="text.secondary"
+                        mb={2}
+                      >
                         {data.address.addressLine1}
                       </Typography>
-                      <Typography variant="body1" color="text.secondary" mb={2}>
+                      <Typography
+                        sx={{ fontSize: "12px" }}
+                        variant="body1"
+                        color="text.secondary"
+                        mb={2}
+                      >
                         {data.address.addressLine2}
                       </Typography>
-                      <Typography variant="body1" color="text.secondary" mb={2}>
+                      <Typography
+                        sx={{ fontSize: "12px" }}
+                        variant="body1"
+                        color="text.secondary"
+                        mb={2}
+                      >
                         {data.address.pincode}
                       </Typography>
                       <Map
@@ -152,7 +165,7 @@ const PickupBox = ({ pickupId, data, reserve, reservation }) => {
                   </CardContent>
                 )}
               </Card>
-              <ItemPhotos photoLink={data.images} />
+              {!expandedMap && <ItemPhotos photoLink={data.images} />}
               <Box>
                 {!reserve && (
                   <Button
