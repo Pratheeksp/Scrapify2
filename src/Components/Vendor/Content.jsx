@@ -56,15 +56,19 @@ const Content = () => {
     (item) =>
       reservation.some((reser) => reser.pickupId === item.id) && !item.picked
   );
-
+  const today = new Date();
+  const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+  console.log(formattedDate)
   const availablePickups = pickupData.filter(
     (item) =>
       !reservation.some((reserve) => reserve.pickupId === item.id) &&
       item.reservedBy !== vendorId &&
-      !item.picked
+      !item.picked &&
+      item.date==formattedDate
   );
 
-  // console.log(reservationCount);
+
+  console.log(availablePickups);
   return (
     <ThemeProvider theme={theme}>
       <Box
