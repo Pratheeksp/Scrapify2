@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Table,
@@ -7,7 +7,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  // Divider,
   FormControl,
   IconButton,
   InputAdornment,
@@ -17,15 +16,37 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { collection, doc, getDoc, updateDoc } from "firebase/firestore";
+import { db } from "../../../config/firebase";
 
-// Importing Firebase related dependencies
-import { doc } from "firebase/firestore";
-import { updateDoc } from "firebase/firestore";
-import { db } from "../../../config/firebase"; // Make sure to import your Firebase configuration
-
-const Display = ({ id, subcat }) => {
+const Display = ({ id, subcat,newSubCat }) => {
   const [editedPrice, setEditedPrice] = useState(0);
   const [editedIndex, setEditedIndex] = useState(null);
+  const [subCategories, setSubCategories] = useState(subcat);
+
+  useEffect(() => {
+    setSubCategories(subcat);
+  }, [subcat]);
+
+  useEffect(() => {
+    const fetchSubCategories = async () => {
+      try {
+        const catRef = doc(db, "categories", id);
+        const categoriesSnap = await getDoc(catRef);
+        if (categoriesSnap.exists()) {
+          const data = categoriesSnap.data();
+          setSubCategories(data.subcategories);
+        } else {
+          console.log("No such document");
+        }
+      } catch (err) {
+        console.log("Error fetching subcategories", err);
+      }
+    };
+
+    fetchSubCategories();
+  }, [id,newSubCat]);
 
   const handleEditPrice = (index, value) => {
     setEditedIndex(index);
@@ -37,44 +58,42 @@ const Display = ({ id, subcat }) => {
     setEditedIndex(null);
   };
 
-  console.log(subcat);
-
   const onSavePrice = async (index) => {
     try {
-      // Construct the path to the specific category document
       const categoryRef = doc(db, "categories", id);
-
-      // Parse the edited price to a number
       const parsedPrice = parseFloat(editedPrice);
-
-      // Create a new array to hold the updated subcategory data
-      const updatedSubcat = subcat.map((subcategory, subIndex) => {
+      const updatedSubcat = subCategories.map((subcategory, subIndex) => {
         if (subIndex === index) {
-          // If the current index matches the edited index, update the price
           return {
             ...subcategory,
             subCatPrice: parsedPrice,
           };
-        } else {
-          // Otherwise, return the original subcategory object
-          return subcategory;
         }
+        return subcategory;
       });
-
-      // Update the document in the database with the new array of subcategories
       await updateDoc(categoryRef, {
         subcategories: updatedSubcat,
       });
-
-      console.log("Price updated successfully");
-      console.log("Price for index", index, "updated to", parsedPrice);
+      setSubCategories(updatedSubcat);
     } catch (error) {
       console.error("Error updating price:", error);
+    } finally {
+      setEditedPrice(null);
+      setEditedIndex(null);
     }
+  };
 
-    // Reset edited price and index after saving
-    setEditedPrice(null);
-    setEditedIndex(null);
+  const handleDelete = async (index) => {
+    try {
+      const categoryRef = doc(db, "categories", id);
+      const updatedSubcat = subCategories.filter((_, subIndex) => subIndex !== index);
+      await updateDoc(categoryRef, {
+        subcategories: updatedSubcat,
+      });
+      setSubCategories(updatedSubcat);
+    } catch (error) {
+      console.error("Error deleting subcategory:", error);
+    }
   };
 
   return (
@@ -84,7 +103,7 @@ const Display = ({ id, subcat }) => {
           <TableHead>
             <TableRow>
               <TableCell>
-                <Typography variant="h6" align="center" >
+                <Typography variant="h6" align="center">
                   Name
                 </Typography>
               </TableCell>
@@ -95,17 +114,21 @@ const Display = ({ id, subcat }) => {
               </TableCell>
             </TableRow>
           </TableHead>
-          <TableBody >
-            {subcat.map(({ subcat: name, subCatPrice, unit }, index) => (
-              <TableRow key={name} >
-                <TableCell  align="center" width={"40%"} >{name}</TableCell>
+          <TableBody>
+            {subCategories.map(({ subcat: name, subCatPrice, unit }, index) => (
+              <TableRow key={name}>
+                <TableCell align="center" width={"40%"}>
+                  {name}
+                </TableCell>
                 <TableCell align="center" width={"60%"}>
                   <FormControl>
                     <TextField
-                   
-                      value={editedIndex === index ? editedPrice : subCatPrice+" /"+unit}
+                      value={
+                        editedIndex === index
+                          ? editedPrice
+                          : `${subCatPrice} /${unit}`
+                      }
                       variant="outlined"
-                      // label={unit}
                       inputProps={{ style: { fontSize: "14px" } }}
                       InputProps={{
                         startAdornment: (
@@ -119,13 +142,19 @@ const Display = ({ id, subcat }) => {
                                   onClick={() => onSavePrice(index)}
                                   size="small"
                                 >
-                                  <CheckIcon fontSize="small" sx={{color:'green'}}/>
+                                  <CheckIcon
+                                    fontSize="small"
+                                    sx={{ color: "green" }}
+                                  />
                                 </IconButton>
                                 <IconButton
-                                  onClick={() => handleCancelEdit(index)}
+                                  onClick={() => handleCancelEdit()}
                                   size="small"
                                 >
-                                  <CloseIcon fontSize="small" sx={{color:"red"}}/>
+                                  <CloseIcon
+                                    fontSize="small"
+                                    sx={{ color: "red" }}
+                                  />
                                 </IconButton>
                               </>
                             ) : (
@@ -135,7 +164,10 @@ const Display = ({ id, subcat }) => {
                                 }
                                 size="small"
                               >
-                                <EditIcon fontSize="small" sx={{color:"#1c4be6;"}}/>
+                                <EditIcon
+                                  fontSize="small"
+                                  sx={{ color: "#1c4be6;" }}
+                                />
                               </IconButton>
                             )}
                           </InputAdornment>
@@ -145,6 +177,22 @@ const Display = ({ id, subcat }) => {
                     />
                   </FormControl>
                 </TableCell>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "flex-start",
+                    alignItems: "center",
+                    height: "5em",
+                  }}
+                >
+                  <DeleteIcon
+                    onClick={() => handleDelete(index)}
+                    sx={{
+                      color: "#FF204E",
+                      "&:hover": { cursor: "pointer", color: "#E72929" },
+                    }}
+                  />
+                </Box>
               </TableRow>
             ))}
           </TableBody>

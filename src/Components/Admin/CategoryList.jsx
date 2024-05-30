@@ -54,7 +54,7 @@ const CategoryList = ({ onClick }) => {
         id: uuidv4(),
         cat: input,
         subcategories: [],
-        profit: Math.floor(Math.random() * 20),
+        profit: 12,
       };
 
       setCategories((prevCategories) => [...prevCategories, newCategory]);

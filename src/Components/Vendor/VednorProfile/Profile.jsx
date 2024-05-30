@@ -15,7 +15,7 @@ import {
 import React, { useState, useEffect } from "react";
 import Navbar from "../Navbar"
 
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore";
 import { v4 as uuidv4 } from "uuid";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { imgDB, db } from "../../../config/firebase";
@@ -135,7 +135,7 @@ function Profile() {
   const [open1, setOpen1] = useState(false);
   const [vendorData, setVendorData] = useState(null);
   const [loadingData, setLoadingData] = useState(true);
-
+  const [averageRating,setAverageRating] = useState(0);
   const handleClose = () => {
     setOpen1(false);
   };
@@ -174,6 +174,37 @@ function Profile() {
       setLoadingData(false);
     }
   }, []);
+  useEffect(() => {
+    let vendorId = localStorage.getItem("vid");
+    const fetchPickups = async () => {
+      try {
+        const paymentDocRef = collection(db, "payment");
+        const querySnapshot = await getDocs(
+          query(paymentDocRef, where("vendorId", "==", vendorId))
+        );
+  
+        let totalRating = 0;
+        let numOfValidPickups = 0;
+  
+        querySnapshot.forEach((doc) => {
+          const pickupData = doc.data();
+          if (typeof pickupData.rating === 'number') {
+            totalRating += pickupData.rating;
+            numOfValidPickups++;
+          }
+        });
+  
+        const avgRating = numOfValidPickups > 0 ? totalRating / numOfValidPickups : 0;
+        setAverageRating(avgRating.toFixed(2));
+      } catch (err) {
+        console.error("Error fetching pickups:", err);
+      }
+    };
+  
+    fetchPickups();
+  }, []);
+  
+
 
   return (
     <>
@@ -238,6 +269,16 @@ function Profile() {
                 {vendorData ? vendorData.email : "Loading..."}
               </Typography>
             </Box>
+            
+          </Box>
+          <Box sx={{ margin: "2vh 0" }}>
+            <Box sx={{display:"flex" , justifyContent:"space-between"}}>
+              <Typography sx={{ color: "grey" }}>Average Rating</Typography>
+              <Typography>
+                {averageRating ? averageRating : "Loading..."}
+              </Typography>
+            </Box>
+            
           </Box>
         </Box>
       </Box>

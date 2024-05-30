@@ -69,7 +69,7 @@ const PaymentModal = ({ totalPrice, billItems, onClose }) => {
     try {
       console.log("handlePayment function called");
       setLoading(true);
-      if (paymentMethod === "UPI") {
+
         const response = await axios.post(
           "https://scrapify-pay.onrender.com/payment",
           {
@@ -82,12 +82,13 @@ const PaymentModal = ({ totalPrice, billItems, onClose }) => {
             contact: customerInfo.phone,
             billItems,
             pickupid: pickupId,
+            mode:paymentMethod,
           }
         );
         console.log("response", response.data);
         payId = response.data.payId;
         console.log(payId);
-      }
+
       onClose(); // Close the modal after payment is processed
       navigate("/vendor");
       // Update database with payment information

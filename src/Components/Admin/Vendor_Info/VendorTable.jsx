@@ -9,6 +9,7 @@ import {
   TableRow,
   Paper,
   Typography,
+  Box,
 } from "@mui/material";
 import Navbar from "../Navbar";
 
@@ -43,11 +44,12 @@ const VendorList = () => {
   return (
     <>
       <Navbar nav1={"item"} nav2={"home"} />
+      <Box  sx={{backgroundColor:'rgba(211, 211, 211, 0.3)',height:"100vh"}}>
       <Typography
         align="center"
         variant="h3"
         sx={{
-          margin: "30px",
+          padding:"30px",
           fontSize: { md: "28px", xs: "18px" },
           fontWeight: "bold",
         }}
@@ -66,9 +68,10 @@ const VendorList = () => {
         <Table sx={{ minWidth: "400px" }}>
           <TableHead>
             <TableRow>
-              <TableCell sx={{display:{xs:"none",md:"block"}}} >VendorId</TableCell>
               <TableCell>Name</TableCell>
               <TableCell>Email</TableCell>
+              <TableCell sx={{display:{xs:"none",md:"block"}}} >Contact No</TableCell>
+
             </TableRow>
           </TableHead>
           <TableBody>
@@ -79,14 +82,16 @@ const VendorList = () => {
                 to={`/admin/vendor_info/${vendor.id}`}
                 style={{ textDecoration: "none" }}
               >
-                <TableCell sx={{display:{xs:"none",md:"block"}}}>{vendor.id}</TableCell>
                 <TableCell>{vendor.name}</TableCell>
                 <TableCell>{vendor.email}</TableCell>
+                <TableCell sx={{display:{xs:"none",md:"block"}}}>{vendor.phone}</TableCell>
+
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
+      </Box>
     </>
   );
 };

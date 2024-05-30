@@ -3,8 +3,8 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../Navbar";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../../config/firebase";
+import Rating from "@mui/material/Rating";
 function PrevPickup() {
-  
   const [pickupData, setPickupData] = useState([]);
 
   useEffect(() => {
@@ -74,10 +74,14 @@ function PrevPickup() {
 
                   <Typography fontWeight={"bolder"} fontSize={"20px"}>
                     Amount: &#8377;&nbsp;{" "}
-                    <span style={{ color: "#58A399" }}>
-                      {pick.amount}
-                    </span>
+                    <span style={{ color: "#58A399" }}>{pick.amount}</span>
                   </Typography>
+
+                  <Box sx={{ display: "flex" }}>
+                    <Typography  fontWeight={"bold"} >Rating :</Typography>
+                    <Rating name="read-only" value={pick.rating} readOnly precision={0.5} />
+                  </Box>
+
                   <Divider sx={{ margin: "2vh 0" }} />
 
                   <ul
